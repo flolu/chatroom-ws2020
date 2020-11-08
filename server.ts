@@ -7,7 +7,7 @@ const wss = new WebSocket.Server({server})
 
 wss.on('connection', (socket) => {
   socket.on('message', (msg) => {
-    console.log('received message', msg)
+    console.log(msg)
   })
 })
 
