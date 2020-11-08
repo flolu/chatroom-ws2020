@@ -2,8 +2,11 @@ import * as WebSocket from 'ws'
 import * as inquirer from 'inquirer'
 import * as readline from 'readline'
 
+import {Message, MessageType, UserMessage} from '../shared'
+
 export class ChatClient {
   private isAuthenticated = false
+  private username?: string
 
   constructor(private readonly socket: WebSocket) {}
 
@@ -15,13 +18,22 @@ export class ChatClient {
       {type: 'input', name: 'password', message: 'Password:'},
     ])
     this.isAuthenticated = true
+    this.username = username
 
     const input = readline.createInterface({input: process.stdin})
-    input.on('line', message => this.socket.send(message))
+    input.on('line', message => this.sendMessage(message))
   }
 
-  message(event: WebSocket.MessageEvent) {
+  onMessage(message: UserMessage) {
     if (!this.isAuthenticated) return
-    console.log('>> ' + event.data)
+    console.log(`>> ${message.username}: ${message.message}`)
+  }
+
+  private sendMessage(input: string) {
+    const payload: Message<UserMessage> = {
+      type: MessageType.UserMessage,
+      payload: {username: this.username!, message: input},
+    }
+    this.socket.send(JSON.stringify(payload))
   }
 }
