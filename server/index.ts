@@ -5,9 +5,14 @@ import * as WebSocket from 'ws'
 const server = http.createServer(express)
 const wss = new WebSocket.Server({server})
 
-wss.on('connection', (socket) => {
-  socket.on('message', (msg) => {
+wss.on('connection', socket => {
+  socket.on('message', msg => {
     console.log(msg)
+    wss.clients.forEach(function each(client) {
+      if (client !== socket && client.readyState === WebSocket.OPEN) {
+        client.send(msg)
+      }
+    })
   })
 })
 
