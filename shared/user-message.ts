@@ -1,4 +1,4 @@
-export interface UserMessage {
+export interface TextMessage {
   username: string
   message: string
 }
