@@ -20,6 +20,12 @@ export class ChatServer {
         console.log(`created user with name ${username}`)
       }
 
+      const sockets = Array.from(io.sockets.sockets.values())
+      const usernames = sockets.map(s => (s.handshake.query as any).username)
+      socket.emit(SocketEvent.OnlineUsers, usernames)
+
+      socket.broadcast.emit(SocketEvent.UserOnline, username)
+
       socket.on(SocketEvent.TextMessage, data => {
         const message: TextMessage = JSON.parse(data)
         socket.broadcast.emit(SocketEvent.TextMessage, JSON.stringify(message))

@@ -11,6 +11,14 @@ export class ChatClient {
       const message: TextMessage = JSON.parse(data)
       console.log(`>> ${message.username}: ${message.message}`)
     })
+
+    this.socket.on(SocketEvent.OnlineUsers, (usernames: string[]) => {
+      console.log('Currently online are', usernames.join(', '))
+    })
+
+    this.socket.on(SocketEvent.UserOnline, (username: string) => {
+      console.log('-->', username, 'joined the chat')
+    })
   }
 
   private sendMessage(input: string) {
