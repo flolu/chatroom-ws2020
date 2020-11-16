@@ -28,8 +28,9 @@ server.on('connection', (socket, request) => {
   socket.emit(JSON.stringify(message1))
 
   const message2 = {type: EventName.UserOnline, data: username}
-  server.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify(message2))
+  clients.forEach((client, clientUsername) => {
+    if (client.readyState === WebSocket.OPEN && clientUsername !== username)
+      client.send(JSON.stringify(message2))
   })
 
   socket.on('message', message => {
@@ -37,12 +38,13 @@ server.on('connection', (socket, request) => {
     const {type, data} = JSON.parse(message.toString())
     if (type === EventName.TextMessage) {
       const message3 = {type: EventName.TextMessage, data}
-      server.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) client.send(JSON.stringify(message3))
+      clients.forEach((client, clientUsername) => {
+        if (client.readyState === WebSocket.OPEN && clientUsername !== username)
+          client.send(JSON.stringify(message3))
       })
     }
   })
 })
 
-// TODO broadcast helper, don't send to self
+// TODO broadcast helper
 // TODO message creator helper
