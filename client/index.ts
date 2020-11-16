@@ -30,11 +30,17 @@ async function main() {
         break
       }
       case EventName.OnlineUsers: {
-        console.log('Currently online are', data.join(', '))
+        if (data.length === 0) return console.log('No one is online')
+        if (data.length === 1) return console.log(`Only ${data[0]} is online`)
+        console.log('Currently online are:', data.join(', '))
         break
       }
-      case EventName.UserOnline: {
+      case EventName.UserJoined: {
         console.log('-->', data, 'joined the chat')
+        break
+      }
+      case EventName.UserLeft: {
+        console.log('<--', data, 'left the chat')
         break
       }
     }

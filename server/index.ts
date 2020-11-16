@@ -4,47 +4,46 @@ import {EventName} from '../shared'
 
 const server = new WebSocket.Server({port: 8080})
 const passwords = new Map<string, string>()
-const clients = new Map<string, WebSocket>()
+const connectedClients = new Map<string, WebSocket>()
 
 server.on('connection', (socket, request) => {
   const username = request.headers.username.toString()
   const password = request.headers.password.toString()
   const existingPassword = passwords.get(username)
+  const usernames = Array.from(connectedClients.keys())
 
   if (existingPassword) {
     if (existingPassword !== password) return socket.close()
     console.log(`${username} successfully authenticated`)
   } else {
     passwords.set(username, password)
-    clients.set(username, socket)
+    connectedClients.set(username, socket)
     console.log(`created user with name ${username}`)
   }
 
-  const usernames = []
-  clients.forEach((client, username) => {
-    if (client.readyState === WebSocket.OPEN) usernames.push(username)
-  })
-  const message1 = {type: EventName.OnlineUsers, data: usernames}
-  socket.emit(JSON.stringify(message1))
-
-  const message2 = {type: EventName.UserOnline, data: username}
-  clients.forEach((client, clientUsername) => {
-    if (client.readyState === WebSocket.OPEN && clientUsername !== username)
-      client.send(JSON.stringify(message2))
-  })
+  socket.send(createMessage(EventName.OnlineUsers, usernames))
+  broadcast(username, createMessage(EventName.UserJoined, username))
 
   socket.on('message', message => {
     console.log('incoming message', message)
     const {type, data} = JSON.parse(message.toString())
     if (type === EventName.TextMessage) {
-      const message3 = {type: EventName.TextMessage, data}
-      clients.forEach((client, clientUsername) => {
-        if (client.readyState === WebSocket.OPEN && clientUsername !== username)
-          client.send(JSON.stringify(message3))
-      })
+      broadcast(username, createMessage(EventName.TextMessage, data))
     }
+  })
+
+  socket.on('close', () => {
+    broadcast(username, createMessage(EventName.UserLeft, username))
+    connectedClients.delete(username)
   })
 })
 
-// TODO broadcast helper
-// TODO message creator helper
+function broadcast(fromUsername: string, message: string) {
+  connectedClients.forEach((client, username) => {
+    if (client.readyState === WebSocket.OPEN && username !== fromUsername) client.send(message)
+  })
+}
+
+function createMessage(name: EventName, data: any) {
+  return JSON.stringify({type: name, data})
+}
