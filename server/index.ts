@@ -38,6 +38,10 @@ server.on('connection', (socket, request) => {
   })
 })
 
+server.on('close', () => {
+  process.exit()
+})
+
 function broadcast(fromUsername: string, message: string) {
   connectedClients.forEach((client, username) => {
     if (client.readyState === WebSocket.OPEN && username !== fromUsername) client.send(message)
