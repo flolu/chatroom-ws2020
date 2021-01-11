@@ -1,0 +1,16 @@
+version: '3'
+services:
+  server:
+    image: node:lts
+    container_name: fullstack-bazek_server
+    volumes:
+      - ./package.json:/package.json
+      - ./tsconfig.json:/tsconfig.json
+      - ./node_modules:/node_modules
+      - ./libs:/libs
+      - ./services/server:/services/server
+      - ./bazel-bin/libs/config:/bazel-bin/libs/config
+    ports:
+      - '3000:3000'
+    env_file: bazel-bin/libs/config/docker-compose.env
+    command: yarn run ts-node-dev -r tsconfig-paths/register services/server dev

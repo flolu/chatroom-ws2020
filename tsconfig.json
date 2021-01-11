@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@libs/*": ["./libs/*"]
+    },
+    "module": "commonjs",
+    "strict": true,
+    "lib": ["esnext"],
+    "target": "es2015"
+  },
+  "exclude": ["node_modules", "bazel-*"]
+}

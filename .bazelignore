@@ -1,4 +1,3 @@
 node_modules
-bazel-*
 dist
-*.log
+bazel-out
