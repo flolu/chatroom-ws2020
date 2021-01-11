@@ -11,4 +11,5 @@ services:
       - ./services/server:/services/server
     ports:
       - '3000:3000'
+      - '3001:3001'
     command: yarn run ts-node-dev -r tsconfig-paths/register services/server dev

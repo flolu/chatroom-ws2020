@@ -1,5 +1,8 @@
 import {Component} from '@angular/core'
 import {FormControl, FormGroup, Validators} from '@angular/forms'
+import {Store} from '@ngrx/store'
+
+import {AuthActions} from '@store'
 
 @Component({
   selector: 'app-signin',
@@ -21,7 +24,12 @@ export class SigninComponent {
     password: new FormControl('', [Validators.required, Validators.minLength(8)]),
   })
 
+  constructor(private store: Store) {}
+
   signIn() {
-    if (this.form.valid) console.log('sign in')
+    if (this.form.valid) {
+      const {username, password} = this.form.value
+      this.store.dispatch(AuthActions.signIn({username, password}))
+    }
   }
 }

@@ -1,0 +1,22 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_config", "ts_library")
+
+package(default_visibility = [
+    "//services/server-client:__subpackages__",
+    "//services/user-client:__subpackages__",
+])
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    deps = ["//:tsconfig"],
+)
+
+ts_library(
+    name = "client-utils",
+    srcs = glob(["**/*.ts"]),
+    module_name = "@libs/client-utils",
+    tsconfig = "tsconfig",
+    deps = [
+        "@npm//@ngrx/store",
+    ],
+)
