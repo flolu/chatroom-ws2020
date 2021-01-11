@@ -28,7 +28,7 @@ ng_ts_library(
     srcs = ["main.dev.ts"],
     tsconfig = "tsconfig",
     deps = [
-        "//services/user-client/app:dev",
+        "//services/server-client/app:dev",
         "@npm//@angular/platform-browser",
     ],
 )
@@ -51,21 +51,21 @@ insert_html_assets(
 
 concatjs_devserver(
     name = "dev_server",
-    additional_root_paths = ["services/user-client/dev"],
-    entry_module = "chat/services/user-client/main.dev",
-    port = 4201,
+    additional_root_paths = ["services/server-client/dev"],
+    entry_module = "chat/services/server-client/main.dev",
+    port = 4200,
     scripts = [
         "@npm//:node_modules/tslib/tslib.js",
         "//tools:rxjs_umd_modules",
     ],
     static_files = [
         "@npm//:node_modules/zone.js/dist/zone.min.js",
-        "//services/user-client/assets",
+        "//services/server-client/assets",
         "inject_scripts_for_dev",
         "styles.css",
         "favicon.ico",
     ],
-    deps = ["//services/user-client:dev_src"],
+    deps = ["//services/server-client:dev_src"],
 )
 
 ng_ts_library(
@@ -73,7 +73,7 @@ ng_ts_library(
     srcs = ["main.prod.ts"],
     tsconfig = "tsconfig",
     deps = [
-        "//services/user-client/app:prod",
+        "//services/server-client/app:prod",
         "@npm//@angular/core",
         "@npm//@angular/platform-browser",
     ],
@@ -124,7 +124,7 @@ pkg_web(
         "favicon.ico",
         "main.html",
         "styles.css",
-        "//services/user-client/assets",
+        "//services/server-client/assets",
         "@npm//:node_modules/zone.js/dist/zone.min.js",
     ],
 )
@@ -132,8 +132,5 @@ pkg_web(
 history_server(
     name = "app_server",
     data = ["web_app"],
-    templated_args = [
-        "-p 8081",
-        "-a $$(rlocation $(rootpath :web_app))",
-    ],
+    templated_args = ["-a $$(rlocation $(rootpath :web_app))"],
 )

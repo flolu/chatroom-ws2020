@@ -7,6 +7,8 @@
     "build": "bazel build //...",
     "user-client:dev": "ibazel run //services/user-client:dev_server",
     "user-client": "bazel run //services/user-client:app_server",
+    "server-client:dev": "ibazel run //services/server-client:dev_server",
+    "server-client": "bazel run //services/server-client:app_server",
     "patch": "patch-package --patch-dir dev/patches",
     "postinstall": "yarn run patch && ngcc"
   },

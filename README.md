@@ -27,3 +27,10 @@ yarn install && yarn build
 yarn user-client:dev
 yarn user-client
 ```
+
+**Server Client**
+
+```
+yarn server-client:dev
+yarn server-client
+```
