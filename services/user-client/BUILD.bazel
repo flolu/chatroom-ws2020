@@ -1,0 +1,136 @@
+load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
+load("@npm//@bazel/terser:index.bzl", "terser_minified")
+load("@npm//history-server:index.bzl", "history_server")
+load("@npm//@bazel/typescript:index.bzl", "ts_config")
+load("@npm//@bazel/concatjs:index.bzl", "concatjs_devserver")
+load("@io_bazel_rules_sass//:defs.bzl", "sass_binary")
+load("@build_bazel_rules_nodejs//:index.bzl", "pkg_web")
+load("//tools:angular_ts_library.bzl", "ng_ts_library")
+load("//tools:insert_html_assets.bzl", "insert_html_assets")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["ngsw-config.json"])
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    deps = ["//:tsconfig"],
+)
+
+sass_binary(
+    name = "styles",
+    src = "styles.sass",
+)
+
+ng_ts_library(
+    name = "dev_src",
+    srcs = ["main.dev.ts"],
+    tsconfig = "tsconfig",
+    deps = [
+        "//services/user-client/app:dev",
+        "@npm//@angular/platform-browser",
+    ],
+)
+
+insert_html_assets(
+    name = "inject_scripts_for_dev",
+    outs = ["dev/index.html"],
+    asset_paths = [
+        "$(execpath :styles.css)",
+        "$(execpath @npm//:node_modules/zone.js/dist/zone.min.js)",
+        "./_/ts_scripts.js",
+    ],
+    data = [
+        "main.html",
+        "styles.css",
+        "@npm//:node_modules/zone.js/dist/zone.min.js",
+    ],
+    html_file = "main.html",
+)
+
+concatjs_devserver(
+    name = "dev_server",
+    additional_root_paths = ["services/user-client/dev"],
+    entry_module = "chat/services/user-client/main.dev",
+    port = 4200,
+    scripts = [
+        "@npm//:node_modules/tslib/tslib.js",
+        "//tools:rxjs_umd_modules",
+    ],
+    static_files = [
+        "@npm//:node_modules/zone.js/dist/zone.min.js",
+        "//services/user-client/assets",
+        "inject_scripts_for_dev",
+        "styles.css",
+        "favicon.ico",
+    ],
+    deps = ["//services/user-client:dev_src"],
+)
+
+ng_ts_library(
+    name = "prod_src",
+    srcs = ["main.prod.ts"],
+    tsconfig = "tsconfig",
+    deps = [
+        "//services/user-client/app:prod",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+    ],
+)
+
+rollup_bundle(
+    name = "bundle-es2015",
+    config_file = "//tools:rollup.config.js",
+    entry_points = {
+        "main.prod.ts": "index.es2015",
+    },
+    output_dir = True,
+    deps = [
+        "prod_src",
+        "@npm//rollup-plugin-commonjs",
+        "@npm//rollup-plugin-node-resolve",
+    ],
+)
+
+terser_minified(
+    name = "bundle-es2015.min",
+    src = "bundle-es2015",
+    config_file = "//tools:terser.config.json",
+)
+
+insert_html_assets(
+    name = "asset_injected_index_html",
+    outs = ["index.html"],
+    asset_paths = [
+        "$(execpath styles.css)",
+        "$(execpath @npm//:node_modules/zone.js/dist/zone.min.js)",
+        "$(execpath bundle-es2015.min)/index.es2015.js",
+    ],
+    data = [
+        "bundle-es2015.min",
+        "main.html",
+        "styles.css",
+        "@npm//:node_modules/zone.js/dist/zone.min.js",
+    ],
+    html_file = "main.html",
+)
+
+pkg_web(
+    name = "web_app",
+    srcs = [
+        "asset_injected_index_html",
+        "bundle-es2015.min",
+        "favicon.ico",
+        "main.html",
+        "styles.css",
+        "//services/user-client/assets",
+        "@npm//:node_modules/zone.js/dist/zone.min.js",
+    ],
+)
+
+history_server(
+    name = "app_server",
+    data = ["web_app"],
+    templated_args = ["-a $$(rlocation $(rootpath :web_app))"],
+)

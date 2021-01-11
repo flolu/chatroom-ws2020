@@ -21,16 +21,9 @@ Linux, Node.Js, Bazel, Docker Compose, Yarn
 yarn install && yarn build
 ```
 
-**Development**
+**User Client**
 
 ```
-yarn client:dev
-yarn server:dev
-```
-
-**# TODO Production**
-
-```
-yarn client
-yarn server
+yarn user-client:dev
+yarn user-client
 ```
