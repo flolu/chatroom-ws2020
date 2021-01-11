@@ -6,6 +6,10 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('../features/home/home.module').then(m => m.HomeModule),
   },
+  {
+    path: 'signin',
+    loadChildren: () => import('../features/signin/signin.module').then(m => m.SigninModule),
+  },
   {path: '**', redirectTo: '', pathMatch: 'full'},
 ]
 

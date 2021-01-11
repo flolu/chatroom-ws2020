@@ -19,6 +19,7 @@ ng_ts_library(
     tsconfig = "//services/user-client:tsconfig.json",
     deps = [
         "//services/user-client/features/home",
+        "//services/user-client/features/signin",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/platform-browser",
