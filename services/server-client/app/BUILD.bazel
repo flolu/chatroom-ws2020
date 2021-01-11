@@ -32,7 +32,9 @@ ng_ts_library(
     tsconfig = "//services/server-client:tsconfig.json",
     deps = [
         "base",
+        "//services/server-client/store",
         "@npm//@angular/core",
+        "@npm//@ngrx/store-devtools",
     ],
 )
 
@@ -42,6 +44,7 @@ ng_ts_library(
     tsconfig = "//services/server-client:tsconfig.json",
     deps = [
         "base",
+        "//services/server-client/store",
         "@npm//@angular/common",
         "@npm//@angular/core",
     ],
