@@ -2,8 +2,9 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
 import * as cors from 'cors'
+import * as bcrypt from 'bcrypt'
 
-import {SignInRequest} from '@libs/schema'
+import {SignInRequest, User} from '@libs/schema'
 import {AuthToken, authTokenExpirationTime} from './auth-token'
 import {config} from './config'
 import {database} from './database'
@@ -42,14 +43,27 @@ export function setupHttpServer() {
 
   httpServer.post('/signin', async (req, res) => {
     const {username, password} = req.body as SignInRequest
-    console.log('signin', {username, password})
-    // TODO either sign up or sign in
-
     const collection = await database.usersCollection()
+    const user = await collection.findOne({username})
+
+    if (user) {
+      /**
+       * Sign in as an existing user
+       */
+      const match = await bcrypt.compare(password, user.passwordHash)
+      if (!match) return res.status(401).send('Invalid password')
+    } else {
+      /**
+       * Create a new user
+       */
+      const salt = await bcrypt.genSalt(10)
+      const passwordHash = await bcrypt.hash(password, salt)
+      const newUser: User = {username, passwordHash}
+      await collection.insertOne(newUser)
+    }
 
     const token = new AuthToken(username)
     res.cookie(config.authTokenCookieName, token.sign(config.tokenSecret), cookieOptions)
-
     return res.status(200).json({username})
   })
 

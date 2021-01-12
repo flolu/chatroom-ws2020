@@ -1,4 +1,5 @@
 import {MongoClient, Db} from 'mongodb'
+import {User} from '@libs/schema'
 
 import {config} from './config'
 
@@ -19,8 +20,7 @@ class DatabaseAdapter {
 
   async usersCollection() {
     const db = await this.db()
-    // TODO type
-    return db.collection<{username: string}>(this.userCollectionName)
+    return db.collection<User>(this.userCollectionName)
   }
 
   private async setupCollections() {

@@ -15,6 +15,7 @@ ts_library(
     tsconfig = "tsconfig",
     deps = [
         "//libs/schema",
+        "@npm//@types/bcrypt",
         "@npm//@types/body-parser",
         "@npm//@types/cookie-parser",
         "@npm//@types/cors",
@@ -23,6 +24,7 @@ ts_library(
         "@npm//@types/mongodb",
         "@npm//@types/node",
         "@npm//@types/ws",
+        "@npm//bcrypt",
         "@npm//body-parser",
         "@npm//cookie-parser",
         "@npm//cors",

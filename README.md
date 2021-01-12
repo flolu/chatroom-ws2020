@@ -34,3 +34,9 @@ yarn user-client
 yarn server-client:dev
 yarn server-client
 ```
+
+**Authenticated Database Connection String**
+
+```
+mongodb://admin:K7H6cWFUgLdYO5RBfh8YWzbOCiJnMkQZ@localhost:27017
+```
