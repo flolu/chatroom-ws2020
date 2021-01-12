@@ -10,3 +10,7 @@ export interface SignInRequest {
   username: string
   password: string
 }
+
+export interface AdminSecretRequest {
+  secret: string
+}

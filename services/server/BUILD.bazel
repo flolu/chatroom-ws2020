@@ -14,6 +14,7 @@ ts_library(
     srcs = glob(["*.ts"]),
     tsconfig = "tsconfig",
     deps = [
+        "//libs/enums",
         "//libs/schema",
         "@npm//@types/bcrypt",
         "@npm//@types/body-parser",

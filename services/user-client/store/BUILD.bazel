@@ -9,6 +9,7 @@ ng_ts_library(
     tsconfig = "//services/user-client:tsconfig.json",
     deps = [
         "//libs/client-utils",
+        "//libs/enums",
         "//libs/schema",
         "//services/user-client/services",
         "//services/user-client/shared",

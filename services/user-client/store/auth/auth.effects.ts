@@ -5,20 +5,26 @@ import {catchError, switchMap} from 'rxjs/operators'
 import {of} from 'rxjs'
 
 import {AuthenticatedResponse, SignInRequest} from '@libs/schema'
-import {WebSocketService} from '@services'
+import {ApiRoutes, UserApiRoutes} from '@libs/enums'
 import {AuthActions} from './auth.actions'
 import {WebSocketActions} from '../websocket'
 
 @Injectable()
 export class AuthEffects {
-  constructor(private actions$: Actions, private http: HttpClient, private wss: WebSocketService) {}
+  private api = `http://localhost:3001/${ApiRoutes.User}`
+
+  constructor(private actions$: Actions, private http: HttpClient) {}
 
   refreshToken$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.refreshToken),
       switchMap(() => {
         return this.http
-          .post<AuthenticatedResponse>('http://localhost:3001/refresh', {}, {withCredentials: true})
+          .post<AuthenticatedResponse>(
+            `${this.api}/${UserApiRoutes.Refresh}`,
+            {},
+            {withCredentials: true}
+          )
           .pipe(
             switchMap(({username}) => [
               AuthActions.refreshTokenDone({username}),
@@ -36,7 +42,7 @@ export class AuthEffects {
       switchMap(({username, password}) => {
         const payload: SignInRequest = {username, password}
         return this.http
-          .post<AuthenticatedResponse>('http://localhost:3001/signin', payload, {
+          .post<AuthenticatedResponse>(`${this.api}/${UserApiRoutes.SignIn}`, payload, {
             withCredentials: true,
           })
           .pipe(
