@@ -12,7 +12,8 @@
       "@libs/*": ["../../libs/*"],
       "@store": ["./store"],
       "@services": ["./services"],
-      "@guards": ["./guards"]
+      "@guards": ["./guards"],
+      "@shared": ["./shared"]
     }
   }
 }

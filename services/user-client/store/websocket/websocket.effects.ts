@@ -1,15 +1,21 @@
 import {Injectable} from '@angular/core'
 import {Action} from '@ngrx/store'
 import {Actions, createEffect, ofType} from '@ngrx/effects'
-import {switchMap} from 'rxjs/operators'
+import {switchMap, tap} from 'rxjs/operators'
+import {Router} from '@angular/router'
 import {Observable} from 'rxjs'
 
 import {WebSocketService} from '@services'
+import {UserClientRoutes} from '@shared'
 import {WebSocketActions} from './websocket.actions'
 
 @Injectable()
 export class WebSocketEffects {
-  constructor(private actions$: Actions, private webSocketService: WebSocketService) {}
+  constructor(
+    private actions$: Actions,
+    private webSocketService: WebSocketService,
+    private router: Router
+  ) {}
 
   connect$ = createEffect(() =>
     this.actions$.pipe(
@@ -26,5 +32,14 @@ export class WebSocketEffects {
         })
       })
     )
+  )
+
+  opened$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(WebSocketActions.opened),
+        tap(() => this.router.navigate([UserClientRoutes.Home]))
+      ),
+    {dispatch: false}
   )
 }

@@ -8,6 +8,7 @@ ng_ts_library(
     module_name = "@guards",
     tsconfig = "//services/user-client:tsconfig.json",
     deps = [
+        "//services/user-client/shared",
         "//services/user-client/store",
         "@npm//@angular/core",
         "@npm//@angular/router",
