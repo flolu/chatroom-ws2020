@@ -1,32 +1,44 @@
 import * as WebSocket from 'ws'
-import * as jwt from 'jsonwebtoken'
 
-import {AuthTokenPayload} from '@libs/schema'
-import {refreshTokenCookieName, setupHttpServer, tokenSecret} from './http-server'
+import {setupHttpServer} from './http-server'
+import {AugmentedRequest} from './models'
+import * as utils from './utils'
+import {AuthToken} from './auth-token'
+import {config} from './config'
 
-setupHttpServer()
+const wss = new WebSocket.Server({
+  port: 3000,
+  verifyClient: ({req}, callback) => {
+    // TODO handle admin authentication
+    const cookies = utils.parseCookies(req.headers.cookie)
+    const token = cookies[config.authTokenCookieName]
+    if (!token) return callback(false, 401, 'No auth token provided')
 
-const wss = new WebSocket.Server({port: 3000})
+    try {
+      const authToken = AuthToken.fromString(token, config.tokenSecret)
+      ;(req as AugmentedRequest).username = authToken.username
+      ;(req as AugmentedRequest).isAdmin = false
+      callback(true)
+    } catch (error) {
+      callback(false, 401, 'Invalid auth token provded')
+    }
+  },
+})
 console.log('websocket server started on port 3000')
 
-function parseCookies(cookieHeader: string) {
-  let list: Record<string, string> = {}
-  cookieHeader.split(';').forEach(cookie => {
-    const parts = cookie.split('=')
-    list[parts!.shift()!.trim()] = decodeURI(parts.join('='))
-  })
-  return list
-}
-
 wss.on('connection', (ws, req) => {
-  const cookies = parseCookies(req.headers.cookie || '')
-  const token = cookies[refreshTokenCookieName]
-  if (!token) ws.close(WebSocket.CLOSED, 'No token was provided')
-
-  try {
-    const payload = jwt.verify(token, tokenSecret) as AuthTokenPayload
-    console.log(payload.username, 'connected')
-  } catch (error) {
-    if (!token) ws.close(WebSocket.CLOSED, 'Invalid token')
-  }
+  const {username, isAdmin} = req as AugmentedRequest
+  console.log('client connected', {username, isAdmin})
 })
+
+/**
+ * The entire client to server communication uses
+ * web sockets. However for authentication I use
+ * simple HTTP communication
+ *
+ * That's because it's not possible to set cookies
+ * with a web socket connection
+ * But cookies are required for secure, persistent
+ * user authentication
+ */
+setupHttpServer()
