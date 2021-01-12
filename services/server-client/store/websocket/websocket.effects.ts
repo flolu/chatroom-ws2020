@@ -5,30 +5,34 @@ import {switchMap, tap} from 'rxjs/operators'
 import {Router} from '@angular/router'
 import {Observable} from 'rxjs'
 
-import {WebSocketService} from '@services'
+import {SocketMessage} from '@libs/schema'
 import {AdminClientRoutes} from '@shared'
 import {WebSocketActions} from './websocket.actions'
 
 @Injectable()
 export class WebSocketEffects {
-  constructor(
-    private actions$: Actions,
-    private webSocketService: WebSocketService,
-    private router: Router
-  ) {}
+  private url = 'ws://localhost:3000'
+  private websocket: WebSocket
+
+  constructor(private actions$: Actions, private router: Router) {}
 
   connect$ = createEffect(() =>
     this.actions$.pipe(
       ofType(WebSocketActions.connect),
       switchMap(() => {
         return new Observable<Action>(observer => {
-          const websocket = new WebSocket(this.webSocketService.url)
-          this.webSocketService.websocket = websocket
+          this.websocket = new WebSocket(this.url)
 
-          websocket.onopen = () => observer.next(WebSocketActions.opened())
-          websocket.onclose = event =>
+          this.websocket.onopen = () => observer.next(WebSocketActions.opened())
+          this.websocket.onclose = event =>
             observer.next(WebSocketActions.closed({reason: event.reason}))
-          websocket.onerror = () => observer.next(WebSocketActions.error())
+          this.websocket.onerror = () => observer.next(WebSocketActions.error())
+          this.websocket.onmessage = event => {
+            const message = JSON.parse(event.data) as SocketMessage<any>
+            observer.next(
+              WebSocketActions.message({messageType: message.type, payload: message.payload})
+            )
+          }
         })
       })
     )
@@ -38,7 +42,21 @@ export class WebSocketEffects {
     () =>
       this.actions$.pipe(
         ofType(WebSocketActions.opened),
-        tap(() => this.router.navigate([AdminClientRoutes.Home]))
+        tap(() => {
+          this.router.navigate([AdminClientRoutes.Home])
+        })
+      ),
+    {dispatch: false}
+  )
+
+  sendMessages$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(WebSocketActions.send),
+        tap(({messageType, payload}) => {
+          const messsage: SocketMessage<any> = {type: messageType, payload}
+          this.websocket.send(JSON.stringify(messsage))
+        })
       ),
     {dispatch: false}
   )

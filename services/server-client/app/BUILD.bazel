@@ -21,7 +21,6 @@ ng_ts_library(
     deps = [
         "//libs/client-utils",
         "//services/server-client/features/home",
-        "//services/server-client/services",
         "//services/server-client/store",
         "@npm//@angular/common",
         "@npm//@angular/core",

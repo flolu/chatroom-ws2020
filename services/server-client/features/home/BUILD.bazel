@@ -14,8 +14,10 @@ ng_ts_library(
     angular_assets = ["styles"],
     tsconfig = "//services/server-client:tsconfig",
     deps = [
+        "//services/server-client/store",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/router",
+        "@npm//@ngrx/store",
     ],
 )

@@ -1,5 +1,6 @@
 import * as WebSocket from 'ws'
 
+import {SocketMessage} from '@libs/schema'
 import {setupHttpServer} from './http-server'
 import {AugmentedRequest} from './models'
 import * as utils from './utils'
@@ -39,6 +40,14 @@ console.log('websocket server started on port 3000')
 wss.on('connection', (ws, req) => {
   const {username, isAdmin} = req as AugmentedRequest
   console.log('client connected', {username, isAdmin})
+
+  ws.on('message', message => {
+    const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
+    console.log({type, payload})
+  })
+
+  // TODO remove eventually
+  ws.send(JSON.stringify({type: 'test', payload: 'hello'}))
 })
 
 /**
