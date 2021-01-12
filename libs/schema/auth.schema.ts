@@ -11,6 +11,6 @@ export interface SignInRequest {
   password: string
 }
 
-export interface AdminSecretRequest {
+export interface AdminSignInRequest {
   secret: string
 }

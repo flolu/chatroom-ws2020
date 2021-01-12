@@ -13,16 +13,22 @@ ng_ts_library(
     srcs = [
         "app.component.ts",
         "app-base.module.ts",
+        "app-initializer.ts",
         "app-routing.module.ts",
     ],
     angular_assets = ["app_styles"],
     tsconfig = "//services/server-client:tsconfig.json",
     deps = [
+        "//libs/client-utils",
         "//services/server-client/features/home",
+        "//services/server-client/services",
+        "//services/server-client/store",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/platform-browser",
         "@npm//@angular/router",
+        "@npm//@ngrx/store",
+        "@npm//rxjs",
     ],
 )
 

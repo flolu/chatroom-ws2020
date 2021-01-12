@@ -4,7 +4,6 @@ export enum ApiRoutes {
 }
 
 export enum AdminApiRoutes {
-  SignIn = 'signin',
   Authenticate = 'auth',
 }
 

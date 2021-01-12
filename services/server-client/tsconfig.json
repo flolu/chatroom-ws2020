@@ -10,7 +10,9 @@
     "lib": ["esnext", "dom"],
     "paths": {
       "@libs/*": ["../../libs/*"],
-      "@store": ["./store"]
+      "@store": ["./store"],
+      "@shared": ["./shared"],
+      "@services": ["./services"]
     }
   }
 }

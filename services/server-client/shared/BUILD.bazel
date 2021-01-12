@@ -1,0 +1,10 @@
+load("//tools:angular_ts_library.bzl", "ng_ts_library")
+
+package(default_visibility = ["//services/server-client:__subpackages__"])
+
+ng_ts_library(
+    name = "shared",
+    srcs = glob(["**/*.ts"]),
+    module_name = "@shared",
+    tsconfig = "//services/server-client:tsconfig.json",
+)

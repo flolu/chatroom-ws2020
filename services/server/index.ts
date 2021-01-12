@@ -9,11 +9,21 @@ import {config} from './config'
 const wss = new WebSocket.Server({
   port: 3000,
   verifyClient: ({req}, callback) => {
-    // TODO handle admin authentication
     const cookies = utils.parseCookies(req.headers.cookie)
+    const adminSecret = cookies[config.adminSecretCookieName]
+    if (adminSecret) {
+      /**
+       * Handle admin authentication
+       */
+      if (adminSecret === config.adminSecret) return callback(true)
+    }
+
     const token = cookies[config.authTokenCookieName]
     if (!token) return callback(false, 401, 'No auth token provided')
 
+    /**
+     * Handle user authentication
+     */
     try {
       const authToken = AuthToken.fromString(token, config.tokenSecret)
       ;(req as AugmentedRequest).username = authToken.username

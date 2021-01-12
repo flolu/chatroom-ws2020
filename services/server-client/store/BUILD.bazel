@@ -8,9 +8,17 @@ ng_ts_library(
     module_name = "@store",
     tsconfig = "//services/server-client:tsconfig.json",
     deps = [
+        "//libs/client-utils",
+        "//libs/enums",
+        "//libs/schema",
+        "//services/server-client/services",
+        "//services/server-client/shared",
+        "@npm//@angular/common",
         "@npm//@angular/core",
+        "@npm//@angular/router",
         "@npm//@ngrx/effects",
         "@npm//@ngrx/router-store",
         "@npm//@ngrx/store",
+        "@npm//rxjs",
     ],
 )
