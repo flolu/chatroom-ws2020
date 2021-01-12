@@ -5,7 +5,7 @@ import {catchError, map, switchMap, tap} from 'rxjs/operators'
 import {of} from 'rxjs'
 
 import {AuthenticatedResponse, SignInRequest} from '@libs/schema'
-import {WebSocketService} from '../websocket.service'
+import {WebSocketService} from '@services'
 import {AuthActions} from './auth.actions'
 
 @Injectable()

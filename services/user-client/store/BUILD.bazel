@@ -10,6 +10,7 @@ ng_ts_library(
     deps = [
         "//libs/client-utils",
         "//libs/schema",
+        "//services/user-client/services",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@ngrx/effects",

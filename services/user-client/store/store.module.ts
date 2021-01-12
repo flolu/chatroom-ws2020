@@ -4,7 +4,6 @@ import {EffectsModule} from '@ngrx/effects'
 import {StoreModule} from '@ngrx/store'
 
 import {authReducer, AuthEffects} from './auth'
-import {WebSocketService} from './websocket.service'
 
 @NgModule({
   imports: [
@@ -12,6 +11,6 @@ import {WebSocketService} from './websocket.service'
     StoreModule.forRoot({auth: authReducer}),
     EffectsModule.forRoot([AuthEffects]),
   ],
-  providers: [WebSocketService, AuthEffects],
+  providers: [AuthEffects],
 })
 export class RootStoreModule {}
