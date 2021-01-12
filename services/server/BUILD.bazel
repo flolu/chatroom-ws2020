@@ -20,6 +20,7 @@ ts_library(
         "@npm//@types/cors",
         "@npm//@types/express",
         "@npm//@types/jsonwebtoken",
+        "@npm//@types/mongodb",
         "@npm//@types/node",
         "@npm//@types/ws",
         "@npm//body-parser",
@@ -27,6 +28,7 @@ ts_library(
         "@npm//cors",
         "@npm//express",
         "@npm//jsonwebtoken",
+        "@npm//mongodb",
         "@npm//ws",
     ],
 )

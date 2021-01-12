@@ -6,6 +6,7 @@ import * as cors from 'cors'
 import {SignInRequest} from '@libs/schema'
 import {AuthToken, authTokenExpirationTime} from './auth-token'
 import {config} from './config'
+import {database} from './database'
 
 const cookieOptions = {
   httpOnly: true,
@@ -39,10 +40,12 @@ export function setupHttpServer() {
     }
   })
 
-  httpServer.post('/signin', (req, res) => {
+  httpServer.post('/signin', async (req, res) => {
     const {username, password} = req.body as SignInRequest
     console.log('signin', {username, password})
     // TODO either sign up or sign in
+
+    const collection = await database.usersCollection()
 
     const token = new AuthToken(username)
     res.cookie(config.authTokenCookieName, token.sign(config.tokenSecret), cookieOptions)

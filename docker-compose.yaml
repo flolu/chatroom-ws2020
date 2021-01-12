@@ -13,3 +13,12 @@ services:
       - '3000:3000'
       - '3001:3001'
     command: yarn run ts-node-dev -r tsconfig-paths/register services/server dev
+
+  mongodb:
+    image: mongo:4
+    container_name: chat_mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: K7H6cWFUgLdYO5RBfh8YWzbOCiJnMkQZ
