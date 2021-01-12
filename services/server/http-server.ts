@@ -34,6 +34,7 @@ export function setupHttpServer() {
       res.cookie(config.authTokenCookieName, refreshedToken, cookieOptions)
       res.status(200).json({username: refreshed.username})
     } catch (error) {
+      res.cookie(config.authTokenCookieName, '')
       return res.status(400).send('Auth token invalid')
     }
   })
