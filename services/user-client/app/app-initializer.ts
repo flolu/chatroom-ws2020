@@ -2,19 +2,19 @@ import {Store} from '@ngrx/store'
 import {first, skipWhile, tap} from 'rxjs/operators'
 
 import {LoadStatus} from '@libs/client-utils'
-import {AuthActions, AuthSelectors} from '@store'
+import {AuthActions, WebSocketSelectors} from '@store'
 
 export const initApplication = (store: Store) => {
   return () =>
     new Promise(resolve => {
       store.dispatch(AuthActions.refreshToken())
       store
-        .select(AuthSelectors.state)
+        .select(WebSocketSelectors.state)
         .pipe(
-          skipWhile(state => {
-            if (!state) return true
-            const {status} = state.status
-            const skip = status === LoadStatus.None || status === LoadStatus.Loading
+          skipWhile(websocketState => {
+            const skip =
+              websocketState.status.status === LoadStatus.None ||
+              websocketState.status.status === LoadStatus.Loading
             return skip
           }),
           first(),

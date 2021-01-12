@@ -1,12 +1,13 @@
 import {Injectable} from '@angular/core'
 import {HttpClient} from '@angular/common/http'
 import {Actions, createEffect, ofType} from '@ngrx/effects'
-import {catchError, map, switchMap, tap} from 'rxjs/operators'
+import {catchError, switchMap} from 'rxjs/operators'
 import {of} from 'rxjs'
 
 import {AuthenticatedResponse, SignInRequest} from '@libs/schema'
 import {WebSocketService} from '@services'
 import {AuthActions} from './auth.actions'
+import {WebSocketActions} from '../websocket'
 
 @Injectable()
 export class AuthEffects {
@@ -19,22 +20,14 @@ export class AuthEffects {
         return this.http
           .post<AuthenticatedResponse>('http://localhost:3001/refresh', {}, {withCredentials: true})
           .pipe(
-            map(({username}) => AuthActions.refreshTokenDone({username})),
+            switchMap(({username}) => [
+              AuthActions.refreshTokenDone({username}),
+              WebSocketActions.connect(),
+            ]),
             catchError(({error}) => of(AuthActions.refreshTokenFail({error})))
           )
       })
     )
-  )
-
-  refreshDone$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(AuthActions.refreshTokenDone),
-        tap(() => {
-          this.wss.connect()
-        })
-      ),
-    {dispatch: false}
   )
 
   signIn$ = createEffect(() =>
@@ -47,21 +40,13 @@ export class AuthEffects {
             withCredentials: true,
           })
           .pipe(
-            map(({username}) => AuthActions.signInDone({username})),
+            switchMap(({username}) => [
+              AuthActions.signInDone({username}),
+              WebSocketActions.connect(),
+            ]),
             catchError(({error}) => of(AuthActions.signInFail({error})))
           )
       })
     )
-  )
-
-  signInDone$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(AuthActions.signInDone),
-        tap(() => {
-          this.wss.connect()
-        })
-      ),
-    {dispatch: false}
   )
 }
