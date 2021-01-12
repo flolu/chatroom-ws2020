@@ -11,7 +11,6 @@ ng_ts_library(
         "//libs/client-utils",
         "//libs/enums",
         "//libs/schema",
-        "//services/user-client/services",
         "//services/user-client/shared",
         "@npm//@angular/common",
         "@npm//@angular/core",

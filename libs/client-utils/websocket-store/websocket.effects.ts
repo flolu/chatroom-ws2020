@@ -6,13 +6,12 @@ import {Router} from '@angular/router'
 import {Observable} from 'rxjs'
 
 import {SocketMessage} from '@libs/schema'
-import {AdminClientRoutes} from '@shared'
 import {WebSocketActions} from './websocket.actions'
 
 @Injectable()
 export class WebSocketEffects {
   private url = 'ws://localhost:3000'
-  private websocket: WebSocket
+  private websocket!: WebSocket
 
   constructor(private actions$: Actions, private router: Router) {}
 
@@ -43,7 +42,7 @@ export class WebSocketEffects {
       this.actions$.pipe(
         ofType(WebSocketActions.opened),
         tap(() => {
-          this.router.navigate([AdminClientRoutes.Home])
+          this.router.navigate([])
         })
       ),
     {dispatch: false}

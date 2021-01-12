@@ -1,8 +1,8 @@
 import {createSelector, Store} from '@ngrx/store'
 import {first, skipWhile, tap} from 'rxjs/operators'
 
-import {LoadStatus} from '@libs/client-utils'
-import {AuthActions, AuthSelectors, WebSocketSelectors} from '@store'
+import {LoadStatus, WebSocketSelectors} from '@libs/client-utils'
+import {AuthActions, AuthSelectors} from '@store'
 
 const initialized = createSelector(
   AuthSelectors.state,
@@ -12,7 +12,9 @@ const initialized = createSelector(
 
     const isAuthInitialized = auth.status.status === LoadStatus.Loaded
     const isWebSocketInitialized =
-      websocket.status.status === LoadStatus.Loaded || websocket.status.status === LoadStatus.Error
+      websocket.status &&
+      (websocket.status.status === LoadStatus.Loaded ||
+        websocket.status.status === LoadStatus.Error)
 
     return isAuthInitialized && isWebSocketInitialized
   }

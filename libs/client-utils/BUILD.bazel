@@ -1,4 +1,5 @@
-load("@npm//@bazel/typescript:index.bzl", "ts_config", "ts_library")
+load("@npm//@bazel/typescript:index.bzl", "ts_config")
+load("//tools:angular_ts_library.bzl", "ng_ts_library")
 
 package(default_visibility = [
     "//services/server-client:__subpackages__",
@@ -11,12 +12,17 @@ ts_config(
     deps = ["//:tsconfig"],
 )
 
-ts_library(
+ng_ts_library(
     name = "client-utils",
     srcs = glob(["**/*.ts"]),
     module_name = "@libs/client-utils",
     tsconfig = "tsconfig",
     deps = [
+        "//libs/schema",
+        "@npm//@angular/core",
+        "@npm//@angular/router",
+        "@npm//@ngrx/effects",
         "@npm//@ngrx/store",
+        "@npm//rxjs",
     ],
 )

@@ -3,8 +3,8 @@ import {NgModule} from '@angular/core'
 import {EffectsModule} from '@ngrx/effects'
 import {StoreModule} from '@ngrx/store'
 
+import {WebSocketEffects, websocketReducer} from '@libs/client-utils'
 import {AuthEffects, authReducer} from './auth'
-import {WebSocketEffects, websocketReducer} from './websocket'
 
 @NgModule({
   imports: [

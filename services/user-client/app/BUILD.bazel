@@ -23,7 +23,6 @@ ng_ts_library(
         "//services/user-client/features/home",
         "//services/user-client/features/signin",
         "//services/user-client/guards",
-        "//services/user-client/services",
         "//services/user-client/shared",
         "//services/user-client/store",
         "@npm//@angular/common",

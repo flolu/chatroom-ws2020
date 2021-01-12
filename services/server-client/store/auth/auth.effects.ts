@@ -5,9 +5,9 @@ import {catchError, switchMap} from 'rxjs/operators'
 import {of} from 'rxjs'
 
 import {AdminSignInRequest} from '@libs/schema'
+import {WebSocketActions} from '@libs/client-utils'
 import {AdminApiRoutes, ApiRoutes} from '@libs/enums'
 import {AuthActions} from './auth.actions'
-import {WebSocketActions} from '../websocket'
 
 @Injectable()
 export class AuthEffects {

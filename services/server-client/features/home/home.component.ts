@@ -1,6 +1,7 @@
 import {Component} from '@angular/core'
 import {Store} from '@ngrx/store'
-import {WebSocketActions} from '@store'
+
+import {WebSocketActions} from '@libs/client-utils'
 
 @Component({
   selector: 'app-home',

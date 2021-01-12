@@ -4,10 +4,10 @@ import {Actions, createEffect, ofType} from '@ngrx/effects'
 import {catchError, switchMap} from 'rxjs/operators'
 import {of} from 'rxjs'
 
+import {WebSocketActions} from '@libs/client-utils'
 import {AuthenticatedResponse, SignInRequest} from '@libs/schema'
 import {ApiRoutes, UserApiRoutes} from '@libs/enums'
 import {AuthActions} from './auth.actions'
-import {WebSocketActions} from '../websocket'
 
 @Injectable()
 export class AuthEffects {
