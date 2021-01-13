@@ -3,7 +3,7 @@ import {Component} from '@angular/core'
 import {Store} from '@ngrx/store'
 
 import {Room} from '@libs/schema'
-import {RoomsActions, RoomsSelectors} from '@store'
+import {RoomsActions, RoomsSelectors, UsersSelectors} from '@store'
 
 @Component({
   selector: 'app-home',
@@ -23,11 +23,17 @@ import {RoomsActions, RoomsSelectors} from '@store'
     </div>
 
     <h3>Users</h3>
+    <h4>Online</h4>
+    <div *ngFor="let user of onlineUsers$ | async">{{ user.username }}</div>
+    <h4>Offline</h4>
+    <div *ngFor="let user of offlineUsers$ | async">{{ user.username }}</div>
   `,
   styleUrls: ['home.component.sass'],
 })
 export class HomeComponent {
   rooms$ = this.store.select(RoomsSelectors.all)
+  onlineUsers$ = this.store.select(UsersSelectors.onlineUsers)
+  offlineUsers$ = this.store.select(UsersSelectors.offlineUsers)
 
   form = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),

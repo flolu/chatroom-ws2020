@@ -1,9 +1,14 @@
 import * as WebSocket from 'ws'
 
-import {SocketMessage} from '@libs/schema'
-import {IncomingClientMessageeType, IncomingServerMessageType} from '@libs/enums'
+import {SocketMessage, UserWentOffline} from '@libs/schema'
+import {
+  IncomingClientMessageeType,
+  IncomingServerMessageType,
+  OutgoingServerMessageType,
+} from '@libs/enums'
 import {createRoom, deleteRoom, editRoom} from './room-controllers'
 import {authenticateAdmin, authenticateUser, signInUser} from './anonymous-controllers'
+import {buildSocketMessage} from './socket-message'
 
 export type MessageController = (payload: any, socket: AugmentedSocket) => void
 
@@ -21,7 +26,15 @@ const anonymousControllers: Record<string, MessageController> = {
   [IncomingClientMessageeType.Authenticate]: authenticateUser,
 }
 
-export let onlineUsers = new Map<string, WebSocket>()
+interface ServerState {
+  onlineUsers: Map<string, WebSocket>
+  adminSocket: WebSocket | undefined
+}
+
+export const serverState: ServerState = {
+  onlineUsers: new Map<string, WebSocket>(),
+  adminSocket: undefined,
+}
 
 export interface AugmentedSocket extends WebSocket {
   userId: string
@@ -47,6 +60,13 @@ export async function socketController(socket: AugmentedSocket) {
   })
 
   socket.on('close', () => {
-    if (socket.userId) onlineUsers.delete(socket.userId)
+    if (socket.userId) {
+      serverState.onlineUsers.delete(socket.userId)
+      if (serverState.adminSocket) {
+        const payload: UserWentOffline = {userId: socket.userId}
+        const message = buildSocketMessage(OutgoingServerMessageType.UserWentOffline, payload)
+        serverState.adminSocket.send(message)
+      }
+    }
   })
 }

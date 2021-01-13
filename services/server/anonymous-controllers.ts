@@ -15,16 +15,19 @@ import {
   SignInRequest,
   SignInSuccess,
   User,
+  UserCreated,
+  UserWentOnline,
 } from '@libs/schema'
 import {config} from './config'
 import {database} from './database'
-import {MessageController, onlineUsers} from './socket-controller'
+import {AugmentedSocket, MessageController, serverState} from './socket-controller'
 import {buildSocketMessage} from './socket-message'
 import {AuthToken} from './auth-token'
 
 export const authenticateAdmin: MessageController = async (payload: AuthenticateAdmin, socket) => {
   if (payload.secret === config.adminSecret) {
     socket.isAdmin = true
+    serverState.adminSocket = socket
 
     const authenticatedMessage = buildSocketMessage<AuthenticatedAdmin>(
       OutgoingServerMessageType.Authenticated,
@@ -37,7 +40,7 @@ export const authenticateAdmin: MessageController = async (payload: Authenticate
     socket.send(roomsMessage)
 
     const users = await getUsers()
-    const payload: ListUsers = {users, onlineUserIds: Array.from(onlineUsers.keys())}
+    const payload: ListUsers = {users, onlineUserIds: Array.from(serverState.onlineUsers.keys())}
     const usersMessage = buildSocketMessage<ListUsers>(OutgoingServerMessageType.ListUsers, payload)
     socket.send(usersMessage)
   }
@@ -66,7 +69,8 @@ export const signInUser: MessageController = async (payload: SignInRequest, sock
     const {passwordHash, ...publicUser} = user
     const match = await bcrypt.compare(password, user.passwordHash)
     if (match) {
-      onlineUsers.set(user.id, socket)
+      userWentOnline(user.id, socket)
+      socket.userId = user.id
       socket.send(
         buildSocketMessage<SignInSuccess>(OutgoingClientMessageType.SignInDone, {
           user: removeIdProp(publicUser),
@@ -86,6 +90,15 @@ export const signInUser: MessageController = async (payload: SignInRequest, sock
     const createdUser: User = {id: uuidv4(), username, passwordHash: hash}
     await collection.insertOne(createdUser)
     const {passwordHash, ...publicUser} = createdUser
+
+    socket.userId = createdUser.id
+    serverState.onlineUsers.set(createdUser.id, socket)
+    if (serverState.adminSocket) {
+      const payload: UserCreated = {user: publicUser}
+      const message = buildSocketMessage(OutgoingServerMessageType.UserCreated, payload)
+      serverState.adminSocket.send(message)
+    }
+
     socket.send(
       buildSocketMessage<SignInSuccess>(OutgoingClientMessageType.SignInDone, {
         user: removeIdProp(publicUser),
@@ -102,7 +115,9 @@ export const authenticateUser: MessageController = async (payload: AuthenticateR
     const user = await collection.findOne({id: current.userId})
     if (!user) throw 'User not found'
     const {passwordHash, ...publicUser} = user
-    onlineUsers.set(user.id, socket)
+
+    socket.userId = user.id
+    userWentOnline(user.id, socket)
     socket.send(
       buildSocketMessage<AuthenticateSuccess>(OutgoingClientMessageType.AuthenticateDone, {
         user: publicUser,
@@ -115,5 +130,14 @@ export const authenticateUser: MessageController = async (payload: AuthenticateR
         error: error || 'Invalid token',
       })
     )
+  }
+}
+
+function userWentOnline(userId: string, socket: AugmentedSocket) {
+  serverState.onlineUsers.set(userId, socket)
+  if (serverState.adminSocket) {
+    const payload: UserWentOnline = {userId}
+    const message = buildSocketMessage(OutgoingServerMessageType.UserWentOnline, payload)
+    serverState.adminSocket.send(message)
   }
 }

@@ -11,3 +11,15 @@ export interface ListUsers {
   users: PublicUser[]
   onlineUserIds: string[]
 }
+
+export interface UserCreated {
+  user: PublicUser
+}
+
+export interface UserWentOnline {
+  userId: string
+}
+
+export interface UserWentOffline {
+  userId: string
+}

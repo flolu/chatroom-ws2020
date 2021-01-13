@@ -7,7 +7,7 @@ import {RoomsActions as Actions} from './rooms.actions'
 interface Reducer extends EntityState<Room> {}
 
 const adapter = createEntityAdapter({selectId: (room: Room) => room.id})
-const reducer = createReducer(
+const reducer = createReducer<Reducer>(
   adapter.getInitialState(),
   on(Actions.list, (state, {rooms}) => adapter.upsertMany(rooms, state)),
   on(Actions.created, (state, {room}) => adapter.upsertOne(room, state)),
