@@ -3,7 +3,7 @@ import {Component} from '@angular/core'
 import {Store} from '@ngrx/store'
 
 import {Room} from '@libs/schema'
-import {RoomsActions, RoomsSelectors, UsersSelectors} from '@store'
+import {RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store'
 
 @Component({
   selector: 'app-home',
@@ -24,9 +24,23 @@ import {RoomsActions, RoomsSelectors, UsersSelectors} from '@store'
 
     <h3>Users</h3>
     <h4>Online</h4>
-    <div *ngFor="let user of onlineUsers$ | async">{{ user.username }}</div>
+    <div *ngFor="let user of onlineUsers$ | async">
+      <span>{{ user.username }}</span>
+      <input
+        *ngIf="warnId === user.id"
+        [(ngModel)]="warnMessage"
+        placeholder="Send a message to this user"
+      />
+      <button *ngIf="warnId !== user.id" (click)="startWarning(user.id)">Warn</button>
+      <button *ngIf="warnId === user.id" (click)="warnUser(user.id)">Send</button>
+      <button (click)="kickUser(user.id)">Kick</button>
+      <button (click)="banUser(user.id)">Ban</button>
+    </div>
     <h4>Offline</h4>
-    <div *ngFor="let user of offlineUsers$ | async">{{ user.username }}</div>
+    <div *ngFor="let user of offlineUsers$ | async">
+      <span>{{ user.username }}</span>
+      <button (click)="banUser(user.id)">Ban</button>
+    </div>
   `,
   styleUrls: ['home.component.sass'],
 })
@@ -40,6 +54,8 @@ export class HomeComponent {
   })
   editableRoomId: string
   editableRoomName: string
+  warnId: string
+  warnMessage: string
 
   constructor(private store: Store) {}
 
@@ -61,5 +77,23 @@ export class HomeComponent {
 
   deleteRoom(id: string) {
     this.store.dispatch(RoomsActions.remove({id}))
+  }
+
+  startWarning(id: string) {
+    this.warnId = id
+    this.warnMessage = ''
+  }
+
+  warnUser(id: string) {
+    this.store.dispatch(UsersActions.warn({id, message: this.warnMessage}))
+    this.warnId = ''
+  }
+
+  kickUser(id: string) {
+    this.store.dispatch(UsersActions.kick({id}))
+  }
+
+  banUser(id: string) {
+    this.store.dispatch(UsersActions.ban({id}))
   }
 }

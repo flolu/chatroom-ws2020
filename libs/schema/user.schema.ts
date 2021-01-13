@@ -23,3 +23,20 @@ export interface UserWentOnline {
 export interface UserWentOffline {
   userId: string
 }
+
+export interface WarnUserRequest {
+  message: string
+  userId: string
+}
+
+export interface KickUserRequest {
+  userId: string
+}
+
+export interface BanUserRequest {
+  userId: string
+}
+
+export interface WarnUser {
+  message: string
+}

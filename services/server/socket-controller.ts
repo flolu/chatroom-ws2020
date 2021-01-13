@@ -9,6 +9,7 @@ import {
 import {createRoom, deleteRoom, editRoom} from './room-controllers'
 import {authenticateAdmin, authenticateUser, signInUser} from './anonymous-controllers'
 import {buildSocketMessage} from './socket-message'
+import {banUser, kickUser, warnUser} from './push-user-controllers'
 
 export type MessageController = (payload: any, socket: AugmentedSocket) => void
 
@@ -16,6 +17,10 @@ const adminControllers: Record<string, MessageController> = {
   [IncomingServerMessageType.CreateRoom]: createRoom,
   [IncomingServerMessageType.EditRoom]: editRoom,
   [IncomingServerMessageType.DeleteRoom]: deleteRoom,
+
+  [IncomingServerMessageType.WarnUser]: warnUser,
+  [IncomingServerMessageType.KickUser]: kickUser,
+  [IncomingServerMessageType.BanUser]: banUser,
 }
 
 const userControllers: Record<string, MessageController> = {}

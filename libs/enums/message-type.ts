@@ -7,6 +7,10 @@ export enum IncomingServerMessageType {
   CreateRoom = 'rooms.create',
   EditRoom = 'rooms.edit',
   DeleteRoom = 'rooms.delete',
+
+  WarnUser = 'users.warn',
+  KickUser = 'users.kick',
+  BanUser = 'users.ban',
 }
 
 /**
@@ -42,4 +46,6 @@ export enum OutgoingClientMessageType {
   AuthenticateFail = 'client.authenticate.fail',
   SignInDone = 'client.signIn.done',
   SignInFail = 'client.signIn.fail',
+
+  GotWarning = 'users.gotWarning',
 }
