@@ -1,6 +1,7 @@
 export interface PublicUser {
   id: string
   username: string
+  isBanned: boolean
 }
 
 export interface User extends PublicUser {

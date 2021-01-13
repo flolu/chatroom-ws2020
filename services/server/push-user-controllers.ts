@@ -1,5 +1,6 @@
 import {OutgoingClientMessageType} from '@libs/enums'
 import {BanUserRequest, KickUserRequest, WarnUser, WarnUserRequest} from '@libs/schema'
+import {database} from './database'
 import {MessageController, serverState} from './socket-controller'
 import {buildSocketMessage} from './socket-message'
 
@@ -11,6 +12,16 @@ export const warnUser: MessageController = async (payload: WarnUserRequest) => {
   user.send(message)
 }
 
-export const kickUser: MessageController = async (payload: KickUserRequest, socket) => {}
+export const kickUser: MessageController = async (payload: KickUserRequest) => {
+  const user = serverState.onlineUsers.get(payload.userId)
+  if (!user) return
+  user.close()
+}
 
-export const banUser: MessageController = async (payload: BanUserRequest, socket) => {}
+export const banUser: MessageController = async (payload: BanUserRequest) => {
+  const user = serverState.onlineUsers.get(payload.userId)
+  if (user) user.close()
+
+  const collection = await database.usersCollection()
+  await collection.findOneAndUpdate({id: payload.userId}, {$set: {isBanned: true}})
+}

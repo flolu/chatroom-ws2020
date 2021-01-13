@@ -39,7 +39,8 @@ import {RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store
     <h4>Offline</h4>
     <div *ngFor="let user of offlineUsers$ | async">
       <span>{{ user.username }}</span>
-      <button (click)="banUser(user.id)">Ban</button>
+      <button *ngIf="!user.isBanned" (click)="banUser(user.id)">Ban</button>
+      <span *ngIf="user.isBanned">User is banned</span>
     </div>
   `,
   styleUrls: ['home.component.sass'],

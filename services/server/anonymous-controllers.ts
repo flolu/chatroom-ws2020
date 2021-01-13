@@ -66,6 +66,14 @@ export const signInUser: MessageController = async (payload: SignInRequest, sock
   const user = await collection.findOne({username})
 
   if (user) {
+    if (user.isBanned) {
+      return socket.send(
+        buildSocketMessage<SignInFail>(OutgoingClientMessageType.SignInFail, {
+          error: 'You have been banned from the server',
+        })
+      )
+    }
+
     const {passwordHash, ...publicUser} = user
     const match = await bcrypt.compare(password, user.passwordHash)
     if (match) {
@@ -87,14 +95,14 @@ export const signInUser: MessageController = async (payload: SignInRequest, sock
   } else {
     const salt = await bcrypt.genSalt(10)
     const hash = await bcrypt.hash(password, salt)
-    const createdUser: User = {id: uuidv4(), username, passwordHash: hash}
+    const createdUser: User = {id: uuidv4(), username, passwordHash: hash, isBanned: false}
     await collection.insertOne(createdUser)
     const {passwordHash, ...publicUser} = createdUser
 
     socket.userId = createdUser.id
     serverState.onlineUsers.set(createdUser.id, socket)
     if (serverState.adminSocket) {
-      const payload: UserCreated = {user: publicUser}
+      const payload: UserCreated = {user: removeIdProp(publicUser)}
       const message = buildSocketMessage(OutgoingServerMessageType.UserCreated, payload)
       serverState.adminSocket.send(message)
     }
@@ -114,13 +122,22 @@ export const authenticateUser: MessageController = async (payload: AuthenticateR
     const collection = await database.usersCollection()
     const user = await collection.findOne({id: current.userId})
     if (!user) throw 'User not found'
+
+    if (user.isBanned) {
+      return socket.send(
+        buildSocketMessage<SignInFail>(OutgoingClientMessageType.SignInFail, {
+          error: 'You have been banned from the server',
+        })
+      )
+    }
+
     const {passwordHash, ...publicUser} = user
 
     socket.userId = user.id
     userWentOnline(user.id, socket)
     socket.send(
       buildSocketMessage<AuthenticateSuccess>(OutgoingClientMessageType.AuthenticateDone, {
-        user: publicUser,
+        user: removeIdProp(publicUser),
         token: new AuthToken(current.userId).sign(config.tokenSecret),
       })
     )

@@ -72,7 +72,7 @@ export class UsersEffects {
 
   banUser$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(UsersActions.kick),
+      ofType(UsersActions.ban),
       map(({id}) => {
         const payload: BanUserRequest = {userId: id}
         return WebSocketActions.send({messageType: IncomingServerMessageType.BanUser, payload})
