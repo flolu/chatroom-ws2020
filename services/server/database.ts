@@ -1,11 +1,10 @@
 import {MongoClient, Db} from 'mongodb'
-import {User} from '@libs/schema'
+import {Room, User} from '@libs/schema'
 
 import {config} from './config'
 
 class DatabaseAdapter {
   private client!: MongoClient
-  private userCollectionName = 'users'
 
   constructor() {
     this.client = new MongoClient(config.databaseUrl, {
@@ -20,12 +19,19 @@ class DatabaseAdapter {
 
   async usersCollection() {
     const db = await this.db()
-    return db.collection<User>(this.userCollectionName)
+    return db.collection<User>('users')
+  }
+
+  async roomsCollection() {
+    const db = await this.db()
+    return db.collection<Room>('rooms')
   }
 
   private async setupCollections() {
-    const users = await this.usersCollection()
+    const [users, rooms] = await Promise.all([this.usersCollection(), this.roomsCollection()])
+
     await users.createIndexes([{key: {username: 1}, name: 'username', unique: true}])
+    await rooms.createIndexes([{key: {id: 1}, name: 'id', unique: true}])
   }
 
   protected async db(): Promise<Db> {

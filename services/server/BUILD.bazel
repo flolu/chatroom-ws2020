@@ -14,6 +14,7 @@ ts_library(
     srcs = glob(["*.ts"]),
     tsconfig = "tsconfig",
     deps = [
+        "//libs/common",
         "//libs/enums",
         "//libs/schema",
         "@npm//@types/bcrypt",
@@ -24,6 +25,7 @@ ts_library(
         "@npm//@types/jsonwebtoken",
         "@npm//@types/mongodb",
         "@npm//@types/node",
+        "@npm//@types/uuid",
         "@npm//@types/ws",
         "@npm//bcrypt",
         "@npm//body-parser",
@@ -32,6 +34,7 @@ ts_library(
         "@npm//express",
         "@npm//jsonwebtoken",
         "@npm//mongodb",
+        "@npm//uuid",
         "@npm//ws",
     ],
 )

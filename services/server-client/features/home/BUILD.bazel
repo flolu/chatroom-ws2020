@@ -15,9 +15,12 @@ ng_ts_library(
     tsconfig = "//services/server-client:tsconfig",
     deps = [
         "//libs/client-utils",
+        "//libs/enums",
+        "//libs/schema",
         "//services/server-client/store",
         "@npm//@angular/common",
         "@npm//@angular/core",
+        "@npm//@angular/forms",
         "@npm//@angular/router",
         "@npm//@ngrx/store",
     ],

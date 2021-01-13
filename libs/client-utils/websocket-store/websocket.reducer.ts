@@ -1,12 +1,6 @@
-import {
-  initialStatus,
-  loadingDone,
-  loadingFail,
-  loadingStart,
-  StatusState,
-} from '@libs/client-utils'
 import {createReducer, on} from '@ngrx/store'
 
+import {StatusState, initialStatus, loadingStart, loadingDone, loadingFail} from '../state.helper'
 import {WebSocketActions as Actions} from './websocket.actions'
 
 interface Reducer {
