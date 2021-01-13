@@ -5,6 +5,7 @@ export enum IncomingServerMessageType {
 }
 
 export enum OutgoingServerMessageType {
+  ListRooms = 'rooms.list',
   CreatedRoom = 'rooms.created',
   EditedRoom = 'rooms.edited',
   DeletedRoom = 'rooms.deleted',

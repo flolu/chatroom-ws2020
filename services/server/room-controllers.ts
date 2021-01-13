@@ -1,12 +1,13 @@
 import {v4 as uuidv4} from 'uuid'
 
-import {CreateRoom, DeleteRoom, EditRoom, Room, SocketMessage} from '@libs/schema'
+import {CreateRoom, DeleteRoom, EditRoom, Room} from '@libs/schema'
 import {removeIdProp} from '@libs/common'
+import {OutgoingServerMessageType} from '@libs/enums'
 import {MessageController} from './socket-controller'
 import {database} from './database'
-import {OutgoingServerMessageType} from '@libs/enums'
+import {buildSocketMessage} from './socket-message'
 
-export const createRoom: MessageController = async (socket, payload: CreateRoom) => {
+export const createRoom: MessageController = async (payload: CreateRoom, socket) => {
   const collection = await database.roomsCollection()
   const room: Room = {
     id: uuidv4(),
@@ -14,17 +15,19 @@ export const createRoom: MessageController = async (socket, payload: CreateRoom)
   }
   const result = await collection.insertOne(room)
   const inserted = result.ops[0]
-  const message: SocketMessage<Room> = {
-    type: OutgoingServerMessageType.CreatedRoom,
-    payload: removeIdProp(inserted),
-  }
-  socket.send(JSON.stringify(message))
+  const message = buildSocketMessage<Room>(
+    OutgoingServerMessageType.CreatedRoom,
+    removeIdProp(inserted)
+  )
+  socket.send(message)
 }
 
-export const editRoom: MessageController = (socket, payload: EditRoom) => {
-  console.log('editRoom', payload)
+export const editRoom: MessageController = async (payload: EditRoom) => {
+  const collection = await database.roomsCollection()
+  await collection.findOneAndUpdate({id: payload.id}, {$set: {name: payload.name}})
 }
 
-export const deleteRoom: MessageController = (socket, payload: DeleteRoom) => {
-  console.log('deleteRoom', payload)
+export const deleteRoom: MessageController = async (payload: DeleteRoom) => {
+  const collection = await database.roomsCollection()
+  await collection.findOneAndDelete({id: payload.id})
 }

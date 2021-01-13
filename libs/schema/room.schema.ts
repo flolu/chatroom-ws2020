@@ -15,3 +15,7 @@ export interface EditRoom {
 export interface DeleteRoom {
   id: string
 }
+
+export interface ListRooms {
+  rooms: Room[]
+}
