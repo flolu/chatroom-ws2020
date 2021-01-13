@@ -23,7 +23,7 @@ export async function socketController(socket: WebSocket, req: AugmentedRequest)
   socket.on('message', message => {
     const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
     const controller = controllers[type]
-    if (controller) return controller(socket, payload)
+    if (controller) return controller(payload, socket)
     console.log('Unkown incoming message type', type)
   })
 

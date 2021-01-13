@@ -5,13 +5,14 @@ import {StoreModule} from '@ngrx/store'
 
 import {WebSocketEffects, websocketReducer} from '@libs/client-utils'
 import {AuthEffects, authReducer} from './auth'
+import {RoomsEffects, roomsReducer} from './rooms'
 
 @NgModule({
   imports: [
     HttpClientModule,
-    StoreModule.forRoot({auth: authReducer, websocket: websocketReducer}),
-    EffectsModule.forRoot([AuthEffects, WebSocketEffects]),
+    StoreModule.forRoot({auth: authReducer, websocket: websocketReducer, rooms: roomsReducer}),
+    EffectsModule.forRoot([AuthEffects, WebSocketEffects, RoomsEffects]),
   ],
-  providers: [AuthEffects, WebSocketEffects],
+  providers: [AuthEffects, WebSocketEffects, RoomsEffects],
 })
 export class RootStoreModule {}
