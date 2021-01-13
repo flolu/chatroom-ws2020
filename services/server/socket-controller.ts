@@ -46,6 +46,10 @@ export interface AugmentedSocket extends WebSocket {
   isAdmin: boolean
 }
 
+export function broadcastMessage(message: string) {
+  serverState.onlineUsers.forEach(user => user.send(message))
+}
+
 export async function socketController(socket: AugmentedSocket) {
   socket.userId = ''
   socket.isAdmin = false

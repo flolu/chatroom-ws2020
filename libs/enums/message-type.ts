@@ -36,6 +36,9 @@ export enum OutgoingServerMessageType {
 export enum IncomingClientMessageeType {
   Authenticate = 'client.authenticate',
   SignIn = 'client.signIn',
+
+  JoinRoom = 'rooms.join',
+  SendMessage = 'rooms.message',
 }
 
 /**
@@ -47,5 +50,14 @@ export enum OutgoingClientMessageType {
   SignInDone = 'client.signIn.done',
   SignInFail = 'client.signIn.fail',
 
-  GotWarning = 'users.gotWarning',
+  GotWarning = 'client.users.gotWarning',
+
+  ListRooms = 'client.rooms.list',
+  RoomCreated = 'client.rooms.created',
+  RoomEdited = 'client.rooms.edited',
+  RoomDeleted = 'client.rooms.deleted',
+  RoomJoinInfo = 'client.rooms.joinInfo',
+  IncomingMessage = 'client.rooms.message',
+  UserJoinedRoom = 'client.rooms.userJoined',
+  UserLeftRoom = 'client.rooms.userLeft',
 }

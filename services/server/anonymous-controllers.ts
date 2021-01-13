@@ -85,6 +85,7 @@ export const signInUser: MessageController = async (payload: SignInRequest, sock
           token: new AuthToken(user.id).sign(config.tokenSecret),
         })
       )
+      await initializeUser(socket)
     } else {
       socket.send(
         buildSocketMessage<SignInFail>(OutgoingClientMessageType.SignInFail, {
@@ -113,6 +114,7 @@ export const signInUser: MessageController = async (payload: SignInRequest, sock
         token: new AuthToken(createdUser.id).sign(config.tokenSecret),
       })
     )
+    await initializeUser(socket)
   }
 }
 
@@ -141,6 +143,7 @@ export const authenticateUser: MessageController = async (payload: AuthenticateR
         token: new AuthToken(current.userId).sign(config.tokenSecret),
       })
     )
+    await initializeUser(socket)
   } catch (error) {
     socket.send(
       buildSocketMessage<AuthenticateFail>(OutgoingClientMessageType.AuthenticateFail, {
@@ -157,4 +160,12 @@ function userWentOnline(userId: string, socket: AugmentedSocket) {
     const message = buildSocketMessage(OutgoingServerMessageType.UserWentOnline, payload)
     serverState.adminSocket.send(message)
   }
+}
+
+async function initializeUser(socket: AugmentedSocket) {
+  const roomsCollection = await database.roomsCollection()
+  const rooms = await roomsCollection.find({})
+  const payload: ListRooms = {rooms: (await rooms.toArray()).map(removeIdProp)}
+  const roomsMessage = buildSocketMessage(OutgoingClientMessageType.ListRooms, payload)
+  socket.send(roomsMessage)
 }

@@ -19,3 +19,7 @@ export interface DeleteRoom {
 export interface ListRooms {
   rooms: Room[]
 }
+
+export interface JoinRoom {
+  id: string
+}
