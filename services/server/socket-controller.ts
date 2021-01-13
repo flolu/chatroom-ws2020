@@ -1,14 +1,11 @@
 import * as WebSocket from 'ws'
 
-import {ListRooms, ListUsers, SocketMessage} from '@libs/schema'
-import {removeIdProp} from '@libs/common'
-import {IncomingServerMessageType, OutgoingServerMessageType} from '@libs/enums'
-import {AugmentedRequest} from './models'
+import {SocketMessage} from '@libs/schema'
+import {IncomingClientMessageeType, IncomingServerMessageType} from '@libs/enums'
 import {createRoom, deleteRoom, editRoom} from './room-controllers'
-import {buildSocketMessage} from './socket-message'
-import {database} from './database'
+import {authenticateAdmin, authenticateUser, signInUser} from './anonymous-controllers'
 
-export type MessageController = (payload: any, ws: WebSocket, req: AugmentedRequest) => void
+export type MessageController = (payload: any, socket: AugmentedSocket) => void
 
 const adminControllers: Record<string, MessageController> = {
   [IncomingServerMessageType.CreateRoom]: createRoom,
@@ -18,54 +15,38 @@ const adminControllers: Record<string, MessageController> = {
 
 const userControllers: Record<string, MessageController> = {}
 
-let onlineUsers = new Map<string, WebSocket>()
-
-export async function socketController(socket: WebSocket, req: AugmentedRequest) {
-  const {userId, isAdmin} = req as AugmentedRequest
-
-  if (isAdmin) {
-    console.log('admin connected')
-
-    socket.on('message', message => {
-      const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
-      const controller = adminControllers[type]
-      if (controller) controller(payload, socket, req)
-    })
-
-    await Promise.all([listRooms(socket), listUsers(socket)])
-  } else {
-    console.log('user connected', userId)
-
-    onlineUsers.set(userId, socket)
-    console.log({onlineUsers})
-    socket.on('message', message => {
-      const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
-      const controller = userControllers[type]
-      if (controller) controller(payload, socket, req)
-    })
-
-    socket.on('close', () => {
-      onlineUsers.delete(userId)
-    })
-  }
+const anonymousControllers: Record<string, MessageController> = {
+  [IncomingServerMessageType.Authenticate]: authenticateAdmin,
+  [IncomingClientMessageeType.SignIn]: signInUser,
+  [IncomingClientMessageeType.Authenticate]: authenticateUser,
 }
 
-async function listRooms(socket: WebSocket) {
-  const collection = await database.roomsCollection()
-  const result = await collection.find({})
-  const rooms = (await result.toArray()).map(removeIdProp)
-  const message = buildSocketMessage<ListRooms>(OutgoingServerMessageType.ListRooms, {rooms})
-  socket.send(message)
+export let onlineUsers = new Map<string, WebSocket>()
+
+export interface AugmentedSocket extends WebSocket {
+  userId: string
+  isAdmin: boolean
 }
 
-async function listUsers(socket: WebSocket) {
-  const collection = await database.usersCollection()
-  const result = await collection.find({})
-  const users = (await result.toArray())
-    .map(removeIdProp)
-    .map(({passwordHash, ...publicUser}) => publicUser)
+export async function socketController(socket: AugmentedSocket) {
+  socket.userId = ''
+  socket.isAdmin = false
 
-  const payload: ListUsers = {users, onlineUserIds: Array.from(onlineUsers.keys())}
-  const message = buildSocketMessage<ListUsers>(OutgoingServerMessageType.ListUsers, payload)
-  socket.send(message)
+  console.log('anonymous client connected')
+
+  socket.on('message', message => {
+    const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
+    let controller: MessageController | undefined
+
+    if (!socket.isAdmin && !socket.userId) controller = anonymousControllers[type]
+    else if (socket.isAdmin) controller = adminControllers[type]
+    else if (socket.userId) controller = userControllers[type]
+
+    if (controller) controller(payload, socket)
+    else console.log('no controller found for type', type)
+  })
+
+  socket.on('close', () => {
+    if (socket.userId) onlineUsers.delete(socket.userId)
+  })
 }

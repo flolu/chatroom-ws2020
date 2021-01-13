@@ -3,8 +3,8 @@ import {Actions, createEffect, ofType} from '@ngrx/effects'
 import {filter, map} from 'rxjs/operators'
 
 import {CreateRoom, DeleteRoom, EditRoom, ListRooms, Room} from '@libs/schema'
-import {WebSocketActions} from '@libs/client-utils'
 import {IncomingServerMessageType, OutgoingServerMessageType} from '@libs/enums'
+import {WebSocketActions} from '@libs/client-utils'
 import {RoomsActions} from './rooms.actions'
 
 @Injectable()

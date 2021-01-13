@@ -7,20 +7,24 @@ import {
   loadingStart,
   StatusState,
 } from '@libs/client-utils'
+import {PublicUser} from '@libs/schema'
 import {AuthActions as Actions} from './auth.actions'
 
 interface Reducer {
-  username: string | undefined
+  user: PublicUser | undefined
   status: StatusState
+  signInStatus: StatusState
 }
 
 const reducer = createReducer<Reducer>(
-  {username: undefined, status: initialStatus},
-  on(Actions.refreshToken, state => ({...state, status: loadingStart})),
-  on(Actions.refreshTokenDone, (state, {username}) => ({...state, status: loadingDone, username})),
-  on(Actions.refreshTokenFail, (state, {error}) => ({...state, status: loadingFail(error)})),
+  {user: undefined, status: initialStatus, signInStatus: initialStatus},
+  on(Actions.authenticate, state => ({...state, status: loadingStart})),
+  on(Actions.authenticateDone, (state, {user}) => ({...state, status: loadingDone, user})),
+  on(Actions.authenticateFail, (state, {error}) => ({...state, status: loadingFail(error)})),
 
-  on(Actions.signInDone, (state, {username}) => ({...state, username}))
+  on(Actions.signIn, state => ({...state, signInStatus: loadingStart})),
+  on(Actions.signInDone, (state, {user}) => ({...state, signInStatus: loadingDone, user})),
+  on(Actions.signInFail, (state, {error}) => ({...state, signInStatus: loadingFail(error)}))
 )
 
 export {reducer as authReducer, Reducer as AuthReducerState}

@@ -12,7 +12,6 @@ ng_ts_library(
         "//libs/enums",
         "//libs/schema",
         "//services/user-client/shared",
-        "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/router",
         "@npm//@ngrx/effects",

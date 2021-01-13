@@ -1,37 +1,62 @@
 import {Injectable} from '@angular/core'
-import {HttpClient} from '@angular/common/http'
 import {Actions, createEffect, ofType} from '@ngrx/effects'
-import {catchError, switchMap} from 'rxjs/operators'
-import {of} from 'rxjs'
+import {Router} from '@angular/router'
+import {filter, map} from 'rxjs/operators'
 
 import {WebSocketActions} from '@libs/client-utils'
-import {AuthenticatedResponse, SignInRequest} from '@libs/schema'
-import {ApiRoutes, UserApiRoutes} from '@libs/enums'
+import {
+  AuthenticateFail,
+  AuthenticateRequest,
+  AuthenticateSuccess,
+  SignInFail,
+  SignInRequest,
+  SignInSuccess,
+} from '@libs/schema'
+import {IncomingClientMessageeType, OutgoingClientMessageType} from '@libs/enums'
+import {UserClientRoutes} from '@shared'
 import {AuthActions} from './auth.actions'
 
 @Injectable()
 export class AuthEffects {
-  private api = `http://localhost:3001/${ApiRoutes.User}`
+  private tokenKey = 'token'
 
-  constructor(private actions$: Actions, private http: HttpClient) {}
+  constructor(private actions$: Actions, private router: Router) {}
 
-  refreshToken$ = createEffect(() =>
+  authenticate$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.refreshToken),
-      switchMap(() => {
-        return this.http
-          .post<AuthenticatedResponse>(
-            `${this.api}/${UserApiRoutes.Refresh}`,
-            {},
-            {withCredentials: true}
-          )
-          .pipe(
-            switchMap(({username}) => [
-              AuthActions.refreshTokenDone({username}),
-              WebSocketActions.connect(),
-            ]),
-            catchError(({error}) => of(AuthActions.refreshTokenFail({error})))
-          )
+      ofType(AuthActions.authenticate),
+      map(() => {
+        const token = localStorage.getItem(this.tokenKey)
+        if (!token) return AuthActions.authenticateFail({error: 'No token found'})
+
+        const payload: AuthenticateRequest = {token}
+        return WebSocketActions.send({
+          messageType: IncomingClientMessageeType.Authenticate,
+          payload,
+        })
+      })
+    )
+  )
+
+  authenticateDone$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingClientMessageType.AuthenticateDone),
+      map(({payload}: {payload: AuthenticateSuccess}) => {
+        localStorage.setItem(this.tokenKey, payload.token)
+        this.router.navigate([UserClientRoutes.Home])
+        return AuthActions.authenticateDone({user: payload.user})
+      })
+    )
+  )
+
+  authenticateFail$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingClientMessageType.AuthenticateFail),
+      map(({payload}: {payload: AuthenticateFail}) => {
+        localStorage.setItem(this.tokenKey, '')
+        return AuthActions.authenticateFail({error: payload.error})
       })
     )
   )
@@ -39,19 +64,35 @@ export class AuthEffects {
   signIn$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.signIn),
-      switchMap(({username, password}) => {
+      map(({username, password}) => {
         const payload: SignInRequest = {username, password}
-        return this.http
-          .post<AuthenticatedResponse>(`${this.api}/${UserApiRoutes.SignIn}`, payload, {
-            withCredentials: true,
-          })
-          .pipe(
-            switchMap(({username}) => [
-              AuthActions.signInDone({username}),
-              WebSocketActions.connect(),
-            ]),
-            catchError(({error}) => of(AuthActions.signInFail({error})))
-          )
+        return WebSocketActions.send({
+          messageType: IncomingClientMessageeType.SignIn,
+          payload,
+        })
+      })
+    )
+  )
+
+  signInDone$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingClientMessageType.SignInDone),
+      map(({payload}: {payload: SignInSuccess}) => {
+        localStorage.setItem(this.tokenKey, payload.token)
+        this.router.navigate([UserClientRoutes.Home])
+        return AuthActions.signInDone({user: payload.user})
+      })
+    )
+  )
+
+  signInFail$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingClientMessageType.SignInFail),
+      map(({payload}: {payload: SignInFail}) => {
+        localStorage.setItem(this.tokenKey, '')
+        return AuthActions.signInFail({error: payload.error})
       })
     )
   )

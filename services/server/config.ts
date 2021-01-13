@@ -11,8 +11,6 @@ const adminSecret = 'lOINo6JX6y1iKSEx0NJ0XdFlhUvtCeGt'
 const databaseName = 'chat'
 const databaseUser = 'admin'
 const databaseUrl = 'mongodb://mongodb:27017'
-const authTokenCookieName = 'refresh_token'
-const adminSecretCookieName = 'admin_secret'
 
 export const config = {
   tokenSecret,
@@ -22,6 +20,4 @@ export const config = {
   databaseName,
   databaseUser,
   databaseUrl,
-  authTokenCookieName,
-  adminSecretCookieName,
 }

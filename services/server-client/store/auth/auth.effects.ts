@@ -1,32 +1,33 @@
 import {Injectable} from '@angular/core'
-import {HttpClient} from '@angular/common/http'
 import {Actions, createEffect, ofType} from '@ngrx/effects'
-import {catchError, switchMap} from 'rxjs/operators'
-import {of} from 'rxjs'
+import {filter, map} from 'rxjs/operators'
 
-import {AdminSignInRequest} from '@libs/schema'
+import {IncomingServerMessageType, OutgoingServerMessageType} from '@libs/enums'
 import {WebSocketActions} from '@libs/client-utils'
-import {AdminApiRoutes, ApiRoutes} from '@libs/enums'
+import {AuthenticateAdmin} from '@libs/schema'
 import {AuthActions} from './auth.actions'
 
 @Injectable()
 export class AuthEffects {
-  private api = `http://localhost:3001/${ApiRoutes.Admin}`
+  private adminSecret = 'lOINo6JX6y1iKSEx0NJ0XdFlhUvtCeGt'
 
-  constructor(private actions$: Actions, private http: HttpClient) {}
+  constructor(private actions$: Actions) {}
 
   authenticate$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.authenticate),
-      switchMap(({secret}) => {
-        const payload: AdminSignInRequest = {secret}
-        return this.http
-          .post(`${this.api}/${AdminApiRoutes.Authenticate}`, payload, {withCredentials: true})
-          .pipe(
-            switchMap(() => [AuthActions.authenticateDone(), WebSocketActions.connect()]),
-            catchError(({error}) => of(AuthActions.authenticateFail({error})))
-          )
+      map(() => {
+        const payload: AuthenticateAdmin = {secret: this.adminSecret}
+        return WebSocketActions.send({messageType: IncomingServerMessageType.Authenticate, payload})
       })
+    )
+  )
+
+  authenticated$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingServerMessageType.Authenticated),
+      map(() => AuthActions.authenticateDone())
     )
   )
 }

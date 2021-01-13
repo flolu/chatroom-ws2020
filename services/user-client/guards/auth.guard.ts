@@ -14,8 +14,8 @@ export class AuthGuard implements CanActivate {
   canActivate(): Observable<boolean> {
     return this.store.select(AuthSelectors.state).pipe(
       map(state => {
-        if (!state.username) this.router.navigate([UserClientRoutes.SignIn])
-        return !!state.username
+        if (!state.user) this.router.navigate([UserClientRoutes.SignIn])
+        return !!state.user
       })
     )
   }
