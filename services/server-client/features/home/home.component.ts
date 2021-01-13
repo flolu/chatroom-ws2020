@@ -9,11 +9,11 @@ import {RoomsActions, RoomsSelectors} from '@store'
   selector: 'app-home',
   template: `
     <h2>Server Client Home</h2>
+    <h3>Rooms</h3>
     <form [formGroup]="form" (submit)="createRoom()">
       <input formControlName="name" placeholder="Room name" />
       <button [disabled]="!form.valid">Create Room</button>
     </form>
-
     <div *ngFor="let room of rooms$ | async">
       <span *ngIf="editableRoomId !== room.id">{{ room.name }}</span>
       <input *ngIf="editableRoomId === room.id" [(ngModel)]="editableRoomName" />
@@ -21,6 +21,8 @@ import {RoomsActions, RoomsSelectors} from '@store'
       <button *ngIf="editableRoomId === room.id" (click)="editRoom()">Confirm</button>
       <button (click)="deleteRoom(room.id)">Delete</button>
     </div>
+
+    <h3>Users</h3>
   `,
   styleUrls: ['home.component.sass'],
 })

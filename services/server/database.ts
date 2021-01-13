@@ -30,7 +30,10 @@ class DatabaseAdapter {
   private async setupCollections() {
     const [users, rooms] = await Promise.all([this.usersCollection(), this.roomsCollection()])
 
-    await users.createIndexes([{key: {username: 1}, name: 'username', unique: true}])
+    await users.createIndexes([
+      {key: {id: 1}, name: 'id', unique: true},
+      {key: {username: 1}, name: 'username', unique: true},
+    ])
     await rooms.createIndexes([{key: {id: 1}, name: 'id', unique: true}])
   }
 

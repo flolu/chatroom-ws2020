@@ -1,6 +1,6 @@
 import {IncomingMessage} from 'http'
 
 export interface AugmentedRequest extends IncomingMessage {
-  username: string
+  userId: string
   isAdmin: boolean
 }

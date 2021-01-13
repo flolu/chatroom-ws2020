@@ -7,7 +7,7 @@ import {config} from './config'
 import {socketController} from './socket-controller'
 
 export function setupWebSocketServer() {
-  const wss = new WebSocket.Server({
+  const server = new WebSocket.Server({
     port: 3000,
     verifyClient: ({req}, callback) => {
       const cookies = utils.parseCookies(req.headers.cookie)
@@ -30,7 +30,7 @@ export function setupWebSocketServer() {
        */
       try {
         const authToken = AuthToken.fromString(token, config.tokenSecret)
-        ;(req as AugmentedRequest).username = authToken.username
+        ;(req as AugmentedRequest).userId = authToken.userId
         ;(req as AugmentedRequest).isAdmin = false
         callback(true)
       } catch (error) {
@@ -40,5 +40,5 @@ export function setupWebSocketServer() {
   })
   console.log('websocket server started on port 3000')
 
-  wss.on('connection', socketController)
+  server.on('connection', (socket, req) => socketController(socket, req as AugmentedRequest))
 }

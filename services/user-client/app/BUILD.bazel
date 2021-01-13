@@ -29,6 +29,7 @@ ng_ts_library(
         "@npm//@angular/core",
         "@npm//@angular/platform-browser",
         "@npm//@angular/router",
+        "@npm//@ngrx/effects",
         "@npm//@ngrx/store",
         "@npm//rxjs",
     ],

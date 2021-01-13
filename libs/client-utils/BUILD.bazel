@@ -20,7 +20,6 @@ ng_ts_library(
     deps = [
         "//libs/schema",
         "@npm//@angular/core",
-        "@npm//@angular/router",
         "@npm//@ngrx/effects",
         "@npm//@ngrx/store",
         "@npm//rxjs",
