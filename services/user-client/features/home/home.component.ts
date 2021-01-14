@@ -51,20 +51,45 @@ import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors}
         </div>
       </div>
 
-      <div class="content">
-        <ng-container *ngIf="activeRoom$ | async as room">
-          <h3>Chat for Room {{ room.name }}</h3>
-          <h4>Online Users</h4>
-          <div *ngFor="let user of onlineUsers$ | async">{{ user.username }}</div>
-          <h4>Offline Users</h4>
-          <div *ngFor="let user of offlineUsers$ | async">{{ user.username }}</div>
-          <h4>Messages</h4>
-          <div *ngFor="let message of messages$ | async">
-            {{ message.user.username }}: {{ message.message }}
+      <div class="content" *ngIf="activeRoom$ | async as room">
+        <div class="info">
+          <div class="name">{{ room.name }}</div>
+          <div class="users">
+            <app-avatar
+              *ngFor="let user of onlineUsers$ | async"
+              class="avatar online"
+              [user]="user"
+              [online]="true"
+            >
+            </app-avatar>
+            <app-avatar
+              *ngFor="let user of offlineUsers$ | async"
+              class="avatar offline"
+              [user]="user"
+            >
+            </app-avatar>
           </div>
-          <input [(ngModel)]="messageInput" placeholder="Write a message" />
-          <button (click)="sendMessage()">Send</button>
-        </ng-container>
+        </div>
+
+        <div class="messages">
+          <div *ngFor="let message of messages$ | async" class="item">
+            <div class="content" [class.right]="(user$ | async).id === message.fromId">
+              <div class="username" *ngIf="(user$ | async).id !== message.fromId">
+                {{ message.user.username }}
+              </div>
+              <div class="message">{{ message.message }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input">
+          <input
+            [(ngModel)]="messageInput"
+            (keyup.enter)="sendMessage()"
+            placeholder="Write a message"
+          />
+          <span class="send material-icons" (click)="sendMessage()"> send </span>
+        </div>
       </div>
     </div>
   `,

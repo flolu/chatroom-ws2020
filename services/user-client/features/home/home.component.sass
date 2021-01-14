@@ -7,12 +7,12 @@
   display: flex
 
 .panel
-  width: 20rem
+  width: 15rem
   display: flex
   flex-direction: column
-  padding: 1rem
-  border-right: 1px solid lightgrey
-  background: #fcfcfc
+  padding: var(--space)
+  border-right: 1px solid var(--bg-dark)
+  background: var(--bg)
 
   .status
     .connection
@@ -28,16 +28,16 @@
         color: green
 
       .indicator.bad
-        color: red
+        color: var(--error)
 
       .error
-        color: red
+        color: var(--error)
 
     .warning
       background: orange
       border-radius: .5rem
-      padding: 1rem
-      margin-top: 1rem
+      padding: var(--space)
+      margin-top: var(--space)
       .title
         font-size: .8rem
         display: flex
@@ -50,13 +50,13 @@
         margin-top: 0.5rem
 
     .error
-      background: red
+      background: var(--error)
       border-radius: .5rem
-      padding: 1rem
-      margin-top: 1rem
+      padding: var(--space)
+      margin-top: var(--space)
 
   .user
-    margin: 1rem 0
+    margin: var(--space) 0
     display: flex
     flex-direction: column
     align-items: center
@@ -80,7 +80,7 @@
     display: flex
     flex-direction: column
     .item
-      padding: 1rem
+      padding: var(--space)
       cursor: pointer
 
     .item.selected
@@ -89,4 +89,66 @@
 
 .content
   flex: 1
-  padding: 1rem
+  position: relative
+  display: flex
+  flex-direction: column
+
+  .info
+    padding: var(--space)
+    background: var(--bg)
+    display: flex
+    align-items: center
+    border-bottom: 1px solid var(--bg-dark)
+
+    .name
+      margin-right: 1rem
+
+    .users
+      flex: 1
+      display: flex
+      justify-content: flex-end
+      gap: 0.5rem
+
+  .messages
+    flex: 1
+    padding: var(--space)
+    display: flex
+    flex-direction: column
+    overflow-y: auto
+
+    .item
+      font-size: 1rem
+      margin-bottom: 1rem
+      .content
+        display: inline-block
+        flex-wrap: nowrap
+        padding: .5rem var(--space)
+        border-radius: .5rem
+        max-width: 20rem
+        background: var(--bg-dark)
+        .username
+          font-size: .8rem
+          font-weight: bold
+
+      .content.right
+        margin-left: auto
+        float: right
+
+  .input
+    border-top: 1px solid var(--bg-dark)
+    padding: var(--space)
+    display: flex
+    background: var(--bg)
+
+    input
+      font-size: 1.2rem
+      flex: 1
+      border: none
+      outline: none
+      border-radius: .5rem
+      padding: 0 var(--space)
+
+    .send
+      font-size: 2rem
+      padding: .5rem
+      cursor: pointer

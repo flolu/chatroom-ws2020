@@ -4,6 +4,7 @@ import {RouterModule} from '@angular/router'
 import {FormsModule, ReactiveFormsModule} from '@angular/forms'
 
 import {HomeComponent} from './home.component'
+import {AvatarComponent} from './avatar.component'
 
 @NgModule({
   imports: [
@@ -12,6 +13,6 @@ import {HomeComponent} from './home.component'
     ReactiveFormsModule,
     RouterModule.forChild([{path: '', component: HomeComponent}]),
   ],
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, AvatarComponent],
 })
 export class HomeModule {}
