@@ -7,6 +7,7 @@ const state = createFeatureSelector<RoomsReducerState>('rooms')
 const all = createSelector(state, roomsAdapter.getSelectors().selectAll)
 const entities = createSelector(state, roomsAdapter.getSelectors().selectEntities)
 
+const activeRoomId = createSelector(state, s => s.activeRoomId)
 const activeRoom = createSelector(
   state,
   entities,
@@ -28,6 +29,7 @@ const messagesWithUser = createSelector(UsersSelectors.entities, messages, (enti
 export const RoomsSelectors = {
   state,
   all,
+  activeRoomId,
   activeRoom,
   onlineUsers,
   offlineUsers,

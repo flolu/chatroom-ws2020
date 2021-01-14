@@ -9,10 +9,7 @@ import {UserClientRoutes} from '@shared'
 
 @Component({
   selector: 'app-root',
-  template: `
-    <div *ngIf="!(isConnected$ | async)">Disconnected from server. Please reload!</div>
-    <router-outlet></router-outlet>
-  `,
+  template: ` <router-outlet></router-outlet> `,
   styleUrls: ['app.component.sass'],
 })
 export class AppComponent {

@@ -10,5 +10,6 @@ const initialized = createSelector(
   ({status}) => status.status === LoadStatus.Loaded || status.status === LoadStatus.Error
 )
 const isConnected = createSelector(state, s => s.status.status === LoadStatus.Loaded)
+const error = createSelector(state, s => s.status.error)
 
-export const WebSocketSelectors = {state, initialized, isConnected}
+export const WebSocketSelectors = {state, initialized, isConnected, error}

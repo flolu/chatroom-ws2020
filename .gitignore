@@ -2,3 +2,5 @@ node_modules
 bazel-*
 dist
 *.log
+
+logs.txt

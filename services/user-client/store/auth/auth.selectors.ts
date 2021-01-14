@@ -9,5 +9,6 @@ const initialized = createSelector(
   state,
   ({status}) => status.status === LoadStatus.Loaded || status.status === LoadStatus.Error
 )
+const user = createSelector(state, s => s.user)
 
-export const AuthSelectors = {state, initialized}
+export const AuthSelectors = {state, initialized, user}
