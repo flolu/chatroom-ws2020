@@ -25,9 +25,8 @@ import {PushActions, PushSelectors, RoomsActions, RoomsSelectors} from '@store'
       <h4>Offline Users</h4>
       <div *ngFor="let user of offlineUsers$ | async">{{ user.username }}</div>
       <h4>Messages</h4>
-      <!-- TODO we need user entities! and maybe message entites, too -->
       <div *ngFor="let message of messages$ | async">
-        {{ message.fromId }}: {{ message.message }}
+        {{ message.user.username }}: {{ message.message }}
       </div>
       <input [(ngModel)]="messageInput" placeholder="Write a message" />
       <button (click)="sendMessage()">Send</button>
@@ -41,7 +40,7 @@ export class HomeComponent {
   activeRoom$ = this.store.select(RoomsSelectors.activeRoom)
   onlineUsers$ = this.store.select(RoomsSelectors.onlineUsers)
   offlineUsers$ = this.store.select(RoomsSelectors.offlineUsers)
-  messages$ = this.store.select(RoomsSelectors.messages)
+  messages$ = this.store.select(RoomsSelectors.messagesWithUser)
 
   messageInput = ''
 

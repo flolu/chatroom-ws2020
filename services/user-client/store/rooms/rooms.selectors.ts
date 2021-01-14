@@ -1,5 +1,6 @@
 import {createFeatureSelector, createSelector} from '@ngrx/store'
 
+import {UsersSelectors} from '../users/users.selectors'
 import {roomsAdapter, RoomsReducerState} from './rooms.reducer'
 
 const state = createFeatureSelector<RoomsReducerState>('rooms')
@@ -11,10 +12,25 @@ const activeRoom = createSelector(
   entities,
   (state, entities) => entities[state.activeRoomId]
 )
-const onlineUsers = createSelector(state, s => s.users.filter(u => s.onlineUserIds.includes(u.id)))
-const offlineUsers = createSelector(state, s =>
-  s.users.filter(u => !s.onlineUserIds.includes(u.id))
+const onlineUsers = createSelector(UsersSelectors.entities, state, (entities, state) =>
+  state.onlineUserIds.map(id => entities[id])
 )
-const messages = createSelector(state, s => s.messages)
+const offlineUsers = createSelector(UsersSelectors.entities, state, (entities, state) => {
+  const offlineIds = state.allUserIds.filter(id => !state.onlineUserIds.includes(id))
+  return offlineIds.map(id => entities[id])
+})
 
-export const RoomsSelectors = {state, all, activeRoom, onlineUsers, offlineUsers, messages}
+const messages = createSelector(state, s => s.messages)
+const messagesWithUser = createSelector(UsersSelectors.entities, messages, (entities, messages) =>
+  messages.map(m => ({...m, user: entities[m.fromId]}))
+)
+
+export const RoomsSelectors = {
+  state,
+  all,
+  activeRoom,
+  onlineUsers,
+  offlineUsers,
+  messages,
+  messagesWithUser,
+}

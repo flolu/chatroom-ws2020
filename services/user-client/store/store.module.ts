@@ -6,6 +6,7 @@ import {WebSocketEffects, websocketReducer} from '@libs/client-utils'
 import {authReducer, AuthEffects} from './auth'
 import {PushEffects, pushReducer} from './push'
 import {RoomsEffects, roomsReducer} from './rooms'
+import {usersReducer} from './users'
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import {RoomsEffects, roomsReducer} from './rooms'
       websocket: websocketReducer,
       push: pushReducer,
       rooms: roomsReducer,
+      users: usersReducer,
     }),
     EffectsModule.forRoot([AuthEffects, WebSocketEffects, PushEffects, RoomsEffects]),
   ],
