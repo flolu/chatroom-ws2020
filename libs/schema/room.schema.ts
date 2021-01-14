@@ -1,3 +1,6 @@
+import {Message} from './message.schema'
+import {PublicUser} from './user.schema'
+
 export interface Room {
   id: string
   name: string
@@ -22,4 +25,11 @@ export interface ListRooms {
 
 export interface JoinRoom {
   id: string
+}
+
+export interface JoinedRoom {
+  id: string
+  messages: Message[]
+  users: PublicUser[]
+  onlineUserIds: string[]
 }

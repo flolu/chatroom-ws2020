@@ -1,5 +1,5 @@
 import {MongoClient, Db} from 'mongodb'
-import {Room, User} from '@libs/schema'
+import {Message, Room, User} from '@libs/schema'
 
 import {config} from './config'
 
@@ -27,14 +27,24 @@ class DatabaseAdapter {
     return db.collection<Room>('rooms')
   }
 
+  async messagesCollection() {
+    const db = await this.db()
+    return db.collection<Message>('messages')
+  }
+
   private async setupCollections() {
-    const [users, rooms] = await Promise.all([this.usersCollection(), this.roomsCollection()])
+    const [users, rooms, messages] = await Promise.all([
+      this.usersCollection(),
+      this.roomsCollection(),
+      this.messagesCollection(),
+    ])
 
     await users.createIndexes([
       {key: {id: 1}, name: 'id', unique: true},
       {key: {username: 1}, name: 'username', unique: true},
     ])
     await rooms.createIndexes([{key: {id: 1}, name: 'id', unique: true}])
+    await messages.createIndexes([{key: {id: 1}, name: 'id', unique: true}])
   }
 
   protected async db(): Promise<Db> {
