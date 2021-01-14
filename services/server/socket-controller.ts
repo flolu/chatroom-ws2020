@@ -1,4 +1,6 @@
 import * as WebSocket from 'ws'
+import * as fs from 'fs'
+import * as path from 'path'
 
 import {NetworkLog, SocketMessage, UserWentOffline} from '@libs/schema'
 import {
@@ -69,11 +71,10 @@ export async function socketController(socket: AugmentedSocket) {
   socket.isAdmin = false
   socket.roomId = ''
 
-  logMessage('anonymous client connected')
+  await logMessage('anonymous client connected')
 
-  socket.on('message', message => {
+  socket.on('message', async message => {
     const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
-    logMessage({type, payload})
 
     let controller: MessageController | undefined
 
@@ -83,11 +84,11 @@ export async function socketController(socket: AugmentedSocket) {
 
     if (controller) controller(payload, socket)
     else console.log('no controller found for type', type)
+
+    await logMessage({type, payload})
   })
 
-  socket.on('close', () => {
-    logMessage({message: 'client disconnected', userId: socket.userId, isAdmind: socket.isAdmin})
-
+  socket.on('close', async () => {
     if (socket.userId) {
       serverState.onlineUsers.delete(socket.userId)
       if (serverState.adminSocket) {
@@ -101,15 +102,33 @@ export async function socketController(socket: AugmentedSocket) {
       const leaveMessage = buildSocketMessage(OutgoingClientMessageType.UserLeftRoom, socket.userId)
       broadcastToRoom(leaveMessage, socket.roomId)
     }
+
+    await logMessage({
+      message: 'client disconnected',
+      userId: socket.userId,
+      isAdmind: socket.isAdmin,
+    })
   })
 }
 
-function logMessage(data: any) {
+const logFileName = 'logs.txt'
+const logFilePath = path.join(__dirname, logFileName)
+
+async function logMessage(data: any) {
   const payload: NetworkLog = {timestamp: new Date().toISOString(), data}
-  // TODO write to log file
+  const logMessage = buildSocketMessage(OutgoingServerMessageType.Log, payload)
+
+  try {
+    await fs.promises.readFile(logFilePath)
+  } catch (e) {
+    /**
+     * Create logs file if it doesn't exist
+     */
+    await fs.promises.writeFile(logFilePath, '')
+  }
+  await fs.promises.appendFile(logFilePath, logMessage + '\n')
 
   if (serverState.adminSocket) {
-    const logMessage = buildSocketMessage(OutgoingServerMessageType.Log, payload)
     serverState.adminSocket.send(logMessage)
   }
 }
