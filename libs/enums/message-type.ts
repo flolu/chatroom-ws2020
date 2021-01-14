@@ -19,6 +19,8 @@ export enum IncomingServerMessageType {
 export enum OutgoingServerMessageType {
   Authenticated = 'admin.authenticated',
 
+  Log = 'log',
+
   ListRooms = 'rooms.list',
   CreatedRoom = 'rooms.created',
   EditedRoom = 'rooms.edited',

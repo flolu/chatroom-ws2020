@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws'
 
-import {SocketMessage, UserWentOffline} from '@libs/schema'
+import {NetworkLog, SocketMessage, UserWentOffline} from '@libs/schema'
 import {
   IncomingClientMessageeType,
   IncomingServerMessageType,
@@ -69,10 +69,12 @@ export async function socketController(socket: AugmentedSocket) {
   socket.isAdmin = false
   socket.roomId = ''
 
-  console.log('anonymous client connected')
+  logMessage('anonymous client connected')
 
   socket.on('message', message => {
     const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
+    logMessage({type, payload})
+
     let controller: MessageController | undefined
 
     if (!socket.isAdmin && !socket.userId) controller = anonymousControllers[type]
@@ -84,6 +86,8 @@ export async function socketController(socket: AugmentedSocket) {
   })
 
   socket.on('close', () => {
+    logMessage({message: 'client disconnected', userId: socket.userId, isAdmind: socket.isAdmin})
+
     if (socket.userId) {
       serverState.onlineUsers.delete(socket.userId)
       if (serverState.adminSocket) {
@@ -98,4 +102,14 @@ export async function socketController(socket: AugmentedSocket) {
       broadcastToRoom(leaveMessage, socket.roomId)
     }
   })
+}
+
+function logMessage(data: any) {
+  const payload: NetworkLog = {timestamp: new Date().toISOString(), data}
+  // TODO write to log file
+
+  if (serverState.adminSocket) {
+    const logMessage = buildSocketMessage(OutgoingServerMessageType.Log, payload)
+    serverState.adminSocket.send(logMessage)
+  }
 }

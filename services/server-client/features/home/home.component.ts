@@ -3,7 +3,7 @@ import {Component} from '@angular/core'
 import {Store} from '@ngrx/store'
 
 import {Room} from '@libs/schema'
-import {RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store'
+import {LogsSelectors, RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store'
 
 @Component({
   selector: 'app-home',
@@ -44,6 +44,9 @@ import {RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store
       <button *ngIf="!user.isBanned" (click)="banUser(user.id)">Ban</button>
       <span *ngIf="user.isBanned">User is banned</span>
     </div>
+
+    <h3>Logs</h3>
+    <pre>{{ logs$ | async | json }}</pre>
   `,
   styleUrls: ['home.component.sass'],
 })
@@ -51,6 +54,7 @@ export class HomeComponent {
   rooms$ = this.store.select(RoomsSelectors.all)
   onlineUsers$ = this.store.select(UsersSelectors.onlineUsers)
   offlineUsers$ = this.store.select(UsersSelectors.offlineUsers)
+  logs$ = this.store.select(LogsSelectors.all)
 
   form = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),

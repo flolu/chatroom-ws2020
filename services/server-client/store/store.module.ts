@@ -6,6 +6,7 @@ import {WebSocketEffects, websocketReducer} from '@libs/client-utils'
 import {AuthEffects, authReducer} from './auth'
 import {RoomsEffects, roomsReducer} from './rooms'
 import {UsersEffects, usersReducer, userRoomReducer} from './users'
+import {LogsEffects, logsReducer} from './logs'
 
 @NgModule({
   imports: [
@@ -15,9 +16,10 @@ import {UsersEffects, usersReducer, userRoomReducer} from './users'
       rooms: roomsReducer,
       users: usersReducer,
       userRooms: userRoomReducer,
+      logs: logsReducer,
     }),
-    EffectsModule.forRoot([AuthEffects, WebSocketEffects, RoomsEffects, UsersEffects]),
+    EffectsModule.forRoot([AuthEffects, WebSocketEffects, RoomsEffects, UsersEffects, LogsEffects]),
   ],
-  providers: [AuthEffects, WebSocketEffects, RoomsEffects, UsersEffects],
+  providers: [AuthEffects, WebSocketEffects, RoomsEffects, UsersEffects, LogsEffects],
 })
 export class RootStoreModule {}

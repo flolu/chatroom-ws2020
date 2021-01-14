@@ -33,7 +33,6 @@ const reducer = createReducer<Reducer>(
       : [...state.allUserIds, user.id],
     onlineUserIds: [...state.onlineUserIds, user.id],
   })),
-  // TODO user also needs to be removed from users if he hasn't written any message?!
   on(Actions.userLeft, (state, {userId}) => ({
     ...state,
     onlineUserIds: state.onlineUserIds.filter(id => id !== userId),
