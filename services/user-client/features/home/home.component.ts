@@ -1,5 +1,7 @@
-import {Component} from '@angular/core'
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core'
 import {Store} from '@ngrx/store'
+import {Actions, ofType} from '@ngrx/effects'
+import {takeWhile} from 'rxjs/operators'
 
 import {WebSocketSelectors} from '@libs/client-utils'
 import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors} from '@store'
@@ -71,7 +73,7 @@ import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors}
           </div>
         </div>
 
-        <div class="messages">
+        <div class="messages" #messages>
           <div *ngFor="let message of messages$ | async" class="item">
             <div class="content" [class.right]="(user$ | async).id === message.fromId">
               <div class="username" *ngIf="(user$ | async).id !== message.fromId">
@@ -95,7 +97,9 @@ import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors}
   `,
   styleUrls: ['home.component.sass'],
 })
-export class HomeComponent {
+export class HomeComponent implements OnDestroy {
+  @ViewChild('messages') messagesEl: ElementRef<HTMLDivElement>
+
   isConnected$ = this.store.select(WebSocketSelectors.isConnected)
   connectionError$ = this.store.select(WebSocketSelectors.error)
   warnMessage$ = this.store.select(PushSelectors.warnMessage)
@@ -106,10 +110,37 @@ export class HomeComponent {
   offlineUsers$ = this.store.select(RoomsSelectors.offlineUsers)
   messages$ = this.store.select(RoomsSelectors.messagesWithUser)
   user$ = this.store.select(AuthSelectors.user)
-
   messageInput = ''
+  private alive = true
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private actions$: Actions) {
+    this.actions$
+      .pipe(
+        takeWhile(() => this.alive),
+        ofType(RoomsActions.incomingMessage)
+      )
+      .subscribe(() => {
+        setTimeout(() => {
+          this.scrollToBottom()
+        }, 1)
+      })
+
+    this.actions$
+      .pipe(
+        takeWhile(() => this.alive),
+        ofType(RoomsActions.joined)
+      )
+      .subscribe(() => {
+        setTimeout(() => {
+          this.scrollToBottom()
+        }, 1)
+      })
+  }
+
+  private scrollToBottom() {
+    if (this.messagesEl)
+      this.messagesEl.nativeElement.scrollTop = this.messagesEl.nativeElement.scrollHeight
+  }
 
   warnMessageRead() {
     this.store.dispatch(PushActions.readWarnMessage())
@@ -122,5 +153,9 @@ export class HomeComponent {
   sendMessage() {
     this.store.dispatch(RoomsActions.sendMessage({message: this.messageInput}))
     this.messageInput = ''
+  }
+
+  ngOnDestroy() {
+    this.alive = false
   }
 }
