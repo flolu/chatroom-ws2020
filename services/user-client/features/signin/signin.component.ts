@@ -2,23 +2,25 @@ import {Component} from '@angular/core'
 import {FormControl, FormGroup, Validators} from '@angular/forms'
 import {Store} from '@ngrx/store'
 
-import {AuthActions} from '@store'
+import {AuthActions, AuthSelectors} from '@store'
 
 @Component({
   selector: 'app-signin',
   template: `
-    <h2>Sgin In</h2>
-    <form [formGroup]="form" (submit)="signIn()">
-      <input formControlName="username" placeholder="Username" />
-      <br />
-      <input formControlName="password" type="password" placeholder="Password" />
-      <br />
-      <button>Sign in</button>
-    </form>
+    <div class="container">
+      <h2>Sign in</h2>
+      <form [formGroup]="form" (submit)="signIn()">
+        <input formControlName="username" placeholder="Username" />
+        <input formControlName="password" type="password" placeholder="Password" />
+        <button>Submit</button>
+      </form>
+      <p *ngIf="error$ | async as err" class="error">{{ err }}</p>
+    </div>
   `,
   styleUrls: ['signin.component.sass'],
 })
 export class SigninComponent {
+  error$ = this.store.select(AuthSelectors.signInError)
   form = new FormGroup({
     username: new FormControl('', [Validators.required, Validators.minLength(3)]),
     password: new FormControl('', [Validators.required, Validators.minLength(8)]),
