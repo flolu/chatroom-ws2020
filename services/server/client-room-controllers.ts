@@ -1,8 +1,8 @@
 import {v4 as uuidv4} from 'uuid'
 
 import {removeIdProp} from '@libs/common'
-import {OutgoingClientMessageType} from '@libs/enums'
-import {JoinedRoom, JoinRoom, Message} from '@libs/schema'
+import {OutgoingClientMessageType, OutgoingServerMessageType} from '@libs/enums'
+import {JoinedRoom, JoinRoom, Message, UserJoinedRoom, UserLeftRoom} from '@libs/schema'
 import {database} from './database'
 import {broadcastToRoom, MessageController, serverState} from './socket-controller'
 import {buildSocketMessage} from './socket-message'
@@ -17,6 +17,12 @@ export const joinRoom: MessageController = async (payload: JoinRoom, socket) => 
   if (socket.roomId) {
     const leaveMessage = buildSocketMessage(OutgoingClientMessageType.UserLeftRoom, socket.userId)
     broadcastToRoom(leaveMessage, socket.roomId)
+
+    if (serverState.adminSocket) {
+      const payload: UserLeftRoom = {userId: socket.userId, roomId: socket.roomId}
+      const serverLeaveMessage = buildSocketMessage(OutgoingServerMessageType.UserLeftRoom, payload)
+      serverState.adminSocket.send(serverLeaveMessage)
+    }
   }
 
   const messageCollection = await database.messagesCollection()
@@ -42,6 +48,12 @@ export const joinRoom: MessageController = async (payload: JoinRoom, socket) => 
     joinInfoPayload
   )
   socket.send(joinInfoMessage)
+
+  if (serverState.adminSocket) {
+    const payload: UserJoinedRoom = {userId: socket.userId, roomId: socket.roomId}
+    const serverJoinMessage = buildSocketMessage(OutgoingServerMessageType.UserJoinedRoom, payload)
+    serverState.adminSocket.send(serverJoinMessage)
+  }
 
   const joinMessage = buildSocketMessage(
     OutgoingClientMessageType.UserJoinedRoom,

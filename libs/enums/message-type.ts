@@ -28,6 +28,8 @@ export enum OutgoingServerMessageType {
   UserCreated = 'users.created',
   UserWentOnline = 'users.wentOnline',
   UserWentOffline = 'users.wentOffline',
+  UserJoinedRoom = 'users.joinedRoom',
+  UserLeftRoom = 'users.leftRoom',
 }
 
 /**

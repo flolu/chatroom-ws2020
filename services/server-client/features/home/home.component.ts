@@ -35,6 +35,8 @@ import {RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store
       <button *ngIf="warnId === user.id" (click)="warnUser(user.id)">Send</button>
       <button (click)="kickUser(user.id)">Kick</button>
       <button (click)="banUser(user.id)">Ban</button>
+      <span *ngIf="user.room">In room {{ user.room.name }}</span>
+      <span *ngIf="!user.room">In no room</span>
     </div>
     <h4>Offline</h4>
     <div *ngFor="let user of offlineUsers$ | async">

@@ -25,4 +25,33 @@ const reducer = createReducer<Reducer>(
   }))
 )
 
-export {reducer as usersReducer, Reducer as UserReducerState, adapter as usersAdapter}
+interface UserRoomMap {
+  userId: string
+  roomId: string
+}
+
+interface UserRoomReducer extends EntityState<UserRoomMap> {}
+
+const userRoomAdapter = createEntityAdapter({selectId: (map: UserRoomMap) => map.userId})
+const userRoomReducer = createReducer<UserRoomReducer>(
+  userRoomAdapter.getInitialState(),
+  on(Actions.joinedRoom, (state, {userId, roomId}) =>
+    userRoomAdapter.upsertOne({userId, roomId}, state)
+  ),
+  on(Actions.leftRoom, (state, {userId}) => userRoomAdapter.upsertOne({userId, roomId: ''}, state)),
+  on(Actions.wentOnline, (state, {userId}) =>
+    userRoomAdapter.upsertOne({userId, roomId: ''}, state)
+  ),
+  on(Actions.wentOffline, (state, {userId}) =>
+    userRoomAdapter.upsertOne({userId, roomId: ''}, state)
+  )
+)
+
+export {
+  reducer as usersReducer,
+  Reducer as UserReducerState,
+  adapter as usersAdapter,
+  userRoomReducer,
+  userRoomAdapter,
+  UserRoomReducer as UserRoomReducerState,
+}

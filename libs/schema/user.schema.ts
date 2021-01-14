@@ -41,3 +41,13 @@ export interface BanUserRequest {
 export interface WarnUser {
   message: string
 }
+
+export interface UserJoinedRoom {
+  userId: string
+  roomId: string
+}
+
+export interface UserLeftRoom {
+  userId: string
+  roomId: string
+}

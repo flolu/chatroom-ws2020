@@ -7,10 +7,16 @@ import {
   KickUserRequest,
   ListUsers,
   UserCreated,
+  UserJoinedRoom,
+  UserLeftRoom,
   UserWentOnline,
   WarnUserRequest,
 } from '@libs/schema'
-import {IncomingServerMessageType, OutgoingServerMessageType} from '@libs/enums'
+import {
+  IncomingServerMessageType,
+  OutgoingClientMessageType,
+  OutgoingServerMessageType,
+} from '@libs/enums'
 import {WebSocketActions} from '@libs/client-utils'
 import {UsersActions} from './users.actions'
 
@@ -77,6 +83,22 @@ export class UsersEffects {
         const payload: BanUserRequest = {userId: id}
         return WebSocketActions.send({messageType: IncomingServerMessageType.BanUser, payload})
       })
+    )
+  )
+
+  joinedRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingServerMessageType.UserJoinedRoom),
+      map(({payload}) => UsersActions.joinedRoom(payload as UserJoinedRoom))
+    )
+  )
+
+  leftRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingServerMessageType.UserLeftRoom),
+      map(({payload}) => UsersActions.leftRoom(payload as UserLeftRoom))
     )
   )
 }
