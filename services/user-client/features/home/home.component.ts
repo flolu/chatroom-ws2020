@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core'
 import {Store} from '@ngrx/store'
 import {Actions, ofType} from '@ngrx/effects'
-import {takeWhile} from 'rxjs/operators'
+import {debounceTime, takeWhile} from 'rxjs/operators'
 
 import {WebSocketSelectors} from '@libs/client-utils'
 import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors} from '@store'
@@ -117,24 +117,18 @@ export class HomeComponent implements OnDestroy {
     this.actions$
       .pipe(
         takeWhile(() => this.alive),
-        ofType(RoomsActions.incomingMessage)
+        ofType(RoomsActions.incomingMessage),
+        debounceTime(2)
       )
-      .subscribe(() => {
-        setTimeout(() => {
-          this.scrollToBottom()
-        }, 1)
-      })
+      .subscribe(() => this.scrollToBottom())
 
     this.actions$
       .pipe(
         takeWhile(() => this.alive),
-        ofType(RoomsActions.joined)
+        ofType(RoomsActions.joined),
+        debounceTime(2)
       )
-      .subscribe(() => {
-        setTimeout(() => {
-          this.scrollToBottom()
-        }, 1)
-      })
+      .subscribe(() => this.scrollToBottom())
   }
 
   private scrollToBottom() {

@@ -8,22 +8,15 @@ sass_binary(
     src = "home.component.sass",
 )
 
-sass_binary(
-    name = "avatar_styles",
-    src = "avatar.component.sass",
-)
-
 ng_ts_library(
     name = "home",
     srcs = glob(["*.ts"]),
-    angular_assets = [
-        "styles",
-        "avatar_styles",
-    ],
+    angular_assets = ["styles"],
     tsconfig = "//services/user-client:tsconfig",
     deps = [
         "//libs/client-utils",
         "//libs/schema",
+        "//libs/shared-ui",
         "//services/user-client/store",
         "@npm//@angular/common",
         "@npm//@angular/core",

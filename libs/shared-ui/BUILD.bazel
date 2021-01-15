@@ -1,0 +1,29 @@
+load("//tools:angular_ts_library.bzl", "ng_ts_library")
+load("@io_bazel_rules_sass//:defs.bzl", "sass_binary")
+load("@npm//@bazel/typescript:index.bzl", "ts_config")
+
+package(default_visibility = ["//services:__subpackages__"])
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    deps = ["//:tsconfig"],
+)
+
+sass_binary(
+    name = "avatar_styles",
+    src = "avatar.component.sass",
+)
+
+ng_ts_library(
+    name = "shared-ui",
+    srcs = glob(["*.ts"]),
+    angular_assets = ["avatar_styles"],
+    module_name = "@libs/shared-ui",
+    tsconfig = "tsconfig",
+    deps = [
+        "//libs/schema",
+        "@npm//@angular/common",
+        "@npm//@angular/core",
+    ],
+)

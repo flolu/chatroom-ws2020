@@ -1,27 +1,59 @@
 import {FormControl, FormGroup, Validators} from '@angular/forms'
-import {Component} from '@angular/core'
+import {Component, ElementRef, ViewChild} from '@angular/core'
 import {Store} from '@ngrx/store'
 
 import {Room} from '@libs/schema'
-import {LogsSelectors, RoomsActions, RoomsSelectors, UsersActions, UsersSelectors} from '@store'
+import {
+  LogsActions,
+  LogsSelectors,
+  RoomsActions,
+  RoomsSelectors,
+  UsersActions,
+  UsersSelectors,
+} from '@store'
+import {Actions, ofType} from '@ngrx/effects'
+import {debounceTime, takeWhile} from 'rxjs/operators'
 
+// TODO design users
 @Component({
   selector: 'app-home',
   template: `
-    <h2>Server Client Home</h2>
-    <h3>Rooms</h3>
-    <form [formGroup]="form" (submit)="createRoom()">
-      <input formControlName="name" placeholder="Room name" />
-      <button [disabled]="!form.valid">Create Room</button>
-    </form>
-    <div *ngFor="let room of rooms$ | async">
-      <span *ngIf="editableRoomId !== room.id">{{ room.name }}</span>
-      <input *ngIf="editableRoomId === room.id" [(ngModel)]="editableRoomName" />
-      <button *ngIf="editableRoomId !== room.id" (click)="startEditRoom(room)">Edit</button>
-      <button *ngIf="editableRoomId === room.id" (click)="editRoom()">Confirm</button>
-      <button (click)="deleteRoom(room.id)">Delete</button>
-    </div>
+    <div class="container">
+      <div class="logs" #logs>
+        <pre>{{ logs$ | async | json }}</pre>
+      </div>
+      <div class="rooms">
+        <h3>Rooms</h3>
+        <form [formGroup]="form" (submit)="createRoom()">
+          <input formControlName="name" placeholder="Room name" />
+          <span class="create material-icons" (click)="createRoom()">add</span>
+        </form>
+        <div *ngFor="let room of rooms$ | async" class="room">
+          <span *ngIf="editableRoomId !== room.id" class="name">{{ room.name }}</span>
+          <input *ngIf="editableRoomId === room.id" [(ngModel)]="editableRoomName" />
+          <span
+            *ngIf="editableRoomId !== room.id"
+            (click)="startEditRoom(room)"
+            class="edit material-icons"
+          >
+            create
+          </span>
+          <span
+            *ngIf="editableRoomId === room.id"
+            (click)="editRoom()"
+            class="confirm material-icons"
+          >
+            check
+          </span>
+          <span (click)="deleteRoom(room.id)" class="delete material-icons">delete</span>
+        </div>
+      </div>
 
+      <div class="users">
+        <h3>Users</h3>
+      </div>
+    </div>
+    <!--
     <h3>Users</h3>
     <h4>Online</h4>
     <div *ngFor="let user of onlineUsers$ | async">
@@ -45,17 +77,18 @@ import {LogsSelectors, RoomsActions, RoomsSelectors, UsersActions, UsersSelector
       <span *ngIf="user.isBanned">User is banned</span>
     </div>
 
-    <h3>Logs</h3>
-    <pre>{{ logs$ | async | json }}</pre>
+
+    -->
   `,
   styleUrls: ['home.component.sass'],
 })
 export class HomeComponent {
+  @ViewChild('logs') logsEl: ElementRef<HTMLDivElement>
+
   rooms$ = this.store.select(RoomsSelectors.all)
   onlineUsers$ = this.store.select(UsersSelectors.onlineUsers)
   offlineUsers$ = this.store.select(UsersSelectors.offlineUsers)
   logs$ = this.store.select(LogsSelectors.all)
-
   form = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
   })
@@ -63,11 +96,23 @@ export class HomeComponent {
   editableRoomName: string
   warnId: string
   warnMessage: string
+  private alive = true
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private actions$: Actions) {
+    this.actions$
+      .pipe(
+        takeWhile(() => this.alive),
+        ofType(LogsActions.log),
+        debounceTime(2)
+      )
+      .subscribe(() => this.scrollToBottom())
+  }
 
   createRoom() {
-    this.store.dispatch(RoomsActions.create({name: this.form.value.name}))
+    if (this.form.valid) {
+      this.store.dispatch(RoomsActions.create({name: this.form.value.name}))
+      this.form.patchValue({name: ''})
+    }
   }
 
   startEditRoom(room: Room) {
@@ -102,5 +147,9 @@ export class HomeComponent {
 
   banUser(id: string) {
     this.store.dispatch(UsersActions.ban({id}))
+  }
+
+  private scrollToBottom() {
+    if (this.logsEl) this.logsEl.nativeElement.scrollTop = this.logsEl.nativeElement.scrollHeight
   }
 }

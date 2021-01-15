@@ -3,8 +3,8 @@ import {CommonModule} from '@angular/common'
 import {RouterModule} from '@angular/router'
 import {FormsModule, ReactiveFormsModule} from '@angular/forms'
 
+import {SharedUIModule} from '@libs/shared-ui'
 import {HomeComponent} from './home.component'
-import {AvatarComponent} from './avatar.component'
 
 @NgModule({
   imports: [
@@ -12,7 +12,8 @@ import {AvatarComponent} from './avatar.component'
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forChild([{path: '', component: HomeComponent}]),
+    SharedUIModule,
   ],
-  declarations: [HomeComponent, AvatarComponent],
+  declarations: [HomeComponent],
 })
 export class HomeModule {}
