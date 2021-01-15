@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Chatroom System</h1>
   <p>
-    Websocket-based chat application. A project for university.
+    Websocket-based chat application. A college project.
   </p>
 </div>
 
@@ -50,3 +50,7 @@ mongodb://admin:K7H6cWFUgLdYO5RBfh8YWzbOCiJnMkQZ@localhost:27017
 ### Server
 
 ![](./assets/server.png)
+
+# Source Code
+
+https://github.com/flolu/chatroom-ws2020
