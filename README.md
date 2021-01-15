@@ -40,3 +40,13 @@ yarn server-client
 ```
 mongodb://admin:K7H6cWFUgLdYO5RBfh8YWzbOCiJnMkQZ@localhost:27017
 ```
+
+# Preview
+
+### Client
+
+![](./assets/client.png)
+
+### Server
+
+![](./assets/server.png)
