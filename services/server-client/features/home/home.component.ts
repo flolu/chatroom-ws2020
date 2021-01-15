@@ -14,7 +14,6 @@ import {
 import {Actions, ofType} from '@ngrx/effects'
 import {debounceTime, takeWhile} from 'rxjs/operators'
 
-// TODO design users
 @Component({
   selector: 'app-home',
   template: `
@@ -51,34 +50,55 @@ import {debounceTime, takeWhile} from 'rxjs/operators'
 
       <div class="users">
         <h3>Users</h3>
+        <div *ngFor="let user of onlineUsers$ | async" class="user">
+          <div class="content">
+            <app-avatar [user]="user" [online]="true"></app-avatar>
+            <div class="name_and_room">
+              <span>{{ user.username }}</span>
+              <span class="room" *ngIf="user.room">{{ user.room.name }}</span>
+            </div>
+            <span
+              *ngIf="warnId !== user.id"
+              class="warn material-icons"
+              (click)="startWarning(user.id)"
+              title="Warn user"
+              >warning</span
+            >
+            <span class="kick material-icons" (click)="kickUser(user.id)" title="Kick user"
+              >wifi_off</span
+            >
+            <span (click)="banUser(user.id)" class="ban material-icons" title="Ban user">
+              report
+            </span>
+          </div>
+          <div class="warn-container">
+            <input
+              *ngIf="warnId === user.id"
+              [(ngModel)]="warnMessage"
+              placeholder="Send a warning to this user"
+            />
+            <button *ngIf="warnId === user.id" (click)="warnUser(user.id)">Send warning</button>
+          </div>
+        </div>
+
+        <div *ngFor="let user of offlineUsers$ | async" class="user">
+          <div class="content">
+            <app-avatar [user]="user" [online]="false"></app-avatar>
+            <div class="name_and_room">
+              <span>{{ user.username }}</span>
+            </div>
+            <span
+              *ngIf="!user.isBanned"
+              (click)="banUser(user.id)"
+              class="ban material-icons"
+              title="Ban user"
+            >
+              report
+            </span>
+          </div>
+        </div>
       </div>
     </div>
-    <!--
-    <h3>Users</h3>
-    <h4>Online</h4>
-    <div *ngFor="let user of onlineUsers$ | async">
-      <span>{{ user.username }}</span>
-      <input
-        *ngIf="warnId === user.id"
-        [(ngModel)]="warnMessage"
-        placeholder="Send a message to this user"
-      />
-      <button *ngIf="warnId !== user.id" (click)="startWarning(user.id)">Warn</button>
-      <button *ngIf="warnId === user.id" (click)="warnUser(user.id)">Send</button>
-      <button (click)="kickUser(user.id)">Kick</button>
-      <button (click)="banUser(user.id)">Ban</button>
-      <span *ngIf="user.room">In room {{ user.room.name }}</span>
-      <span *ngIf="!user.room">In no room</span>
-    </div>
-    <h4>Offline</h4>
-    <div *ngFor="let user of offlineUsers$ | async">
-      <span>{{ user.username }}</span>
-      <button *ngIf="!user.isBanned" (click)="banUser(user.id)">Ban</button>
-      <span *ngIf="user.isBanned">User is banned</span>
-    </div>
-
-
-    -->
   `,
   styleUrls: ['home.component.sass'],
 })

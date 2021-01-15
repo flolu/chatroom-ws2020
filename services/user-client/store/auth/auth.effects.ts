@@ -56,6 +56,7 @@ export class AuthEffects {
       filter(({messageType}) => messageType === OutgoingClientMessageType.AuthenticateFail),
       map(({payload}: {payload: AuthenticateFail}) => {
         localStorage.setItem(this.tokenKey, '')
+        this.router.navigate([UserClientRoutes.SignIn])
         return AuthActions.authenticateFail({error: payload.error})
       })
     )
@@ -92,6 +93,7 @@ export class AuthEffects {
       filter(({messageType}) => messageType === OutgoingClientMessageType.SignInFail),
       map(({payload}: {payload: SignInFail}) => {
         localStorage.setItem(this.tokenKey, '')
+        this.router.navigate([UserClientRoutes.SignIn])
         return AuthActions.signInFail({error: payload.error})
       })
     )

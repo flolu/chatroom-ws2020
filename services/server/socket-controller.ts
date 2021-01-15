@@ -71,7 +71,7 @@ export async function socketController(socket: AugmentedSocket) {
   socket.isAdmin = false
   socket.roomId = ''
 
-  await logMessage('anonymous client connected')
+  await logMessage('anonymous client connected', '')
 
   socket.on('message', async message => {
     const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
@@ -85,7 +85,7 @@ export async function socketController(socket: AugmentedSocket) {
     if (controller) controller(payload, socket)
     else console.log('no controller found for type', type)
 
-    await logMessage({type, payload})
+    await logMessage({type, payload}, socket.userId)
   })
 
   socket.on('close', async () => {
@@ -103,19 +103,22 @@ export async function socketController(socket: AugmentedSocket) {
       broadcastToRoom(leaveMessage, socket.roomId)
     }
 
-    await logMessage({
-      message: 'client disconnected',
-      userId: socket.userId,
-      isAdmind: socket.isAdmin,
-    })
+    await logMessage(
+      {
+        message: 'client disconnected',
+        userId: socket.userId,
+        isAdmind: socket.isAdmin,
+      },
+      socket.userId
+    )
   })
 }
 
 const logFileName = 'logs.txt'
 const logFilePath = path.join(__dirname, logFileName)
 
-async function logMessage(data: any) {
-  const payload: NetworkLog = {timestamp: new Date().toISOString(), data}
+async function logMessage(data: any, userId: string) {
+  const payload: NetworkLog = {timestamp: new Date().toISOString(), data, userId}
   const logMessage = buildSocketMessage(OutgoingServerMessageType.Log, payload)
 
   try {

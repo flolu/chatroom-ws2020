@@ -12,6 +12,8 @@ export const joinRoom: MessageController = async (payload: JoinRoom, socket) => 
   const user = await userCollection.findOne({id: socket.userId})
   if (!user) return
 
+  if (socket.roomId === payload.id) return
+
   const {passwordHash, ...publicUser} = user
 
   if (socket.roomId) {
