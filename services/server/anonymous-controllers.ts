@@ -28,7 +28,6 @@ export const authenticateAdmin: MessageController = async (payload: Authenticate
 
     const rooms = await getRooms()
 
-    // TODO maybe also show private rooms in server client?!
     const roomsMessage = buildSocketMessage<ListRooms>(OutgoingServerMessageType.ListRooms, {rooms})
     socket.send(roomsMessage)
 

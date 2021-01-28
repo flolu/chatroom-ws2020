@@ -68,6 +68,9 @@ import {WebSocketSelectors} from '@libs/client-utils'
       <div class="content" *ngIf="activeRoom$ | async as room">
         <div class="info">
           <div class="name">{{ room.name }}</div>
+          <div class="close" *ngIf="room.isPrivate">
+            <button (click)="closeRoom(room.id)">Close Room</button>
+          </div>
           <div class="users">
             <app-avatar
               *ngFor="let user of onlineUsers$ | async"
@@ -166,6 +169,10 @@ export class HomeComponent implements OnDestroy {
   createPrivateRoom() {
     this.store.dispatch(RoomsActions.createPrivate({username: this.parnterUsername}))
     this.parnterUsername = ''
+  }
+
+  closeRoom(id: string) {
+    this.store.dispatch(RoomsActions.closePrivate({id}))
   }
 
   ngOnDestroy() {
