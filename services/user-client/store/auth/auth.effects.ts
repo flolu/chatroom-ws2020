@@ -1,19 +1,16 @@
 import {Injectable} from '@angular/core'
-import {Actions, createEffect, ofType} from '@ngrx/effects'
 import {Router} from '@angular/router'
-import {filter, map} from 'rxjs/operators'
+import {Actions, createEffect, ofType} from '@ngrx/effects'
+import {UserClientRoutes} from '@shared'
+import {filter, map, tap} from 'rxjs/operators'
 
 import {WebSocketActions} from '@libs/client-utils'
-import {
-  AuthenticateFail,
-  AuthenticateRequest,
-  AuthenticateSuccess,
-  SignInFail,
-  SignInRequest,
-  SignInSuccess,
-} from '@libs/schema'
 import {IncomingClientMessageeType, OutgoingClientMessageType} from '@libs/enums'
-import {UserClientRoutes} from '@shared'
+import {
+    AuthenticateFail, AuthenticateRequest, AuthenticateSuccess, SignInFail, SignInRequest,
+    SignInSuccess
+} from '@libs/schema'
+
 import {AuthActions} from './auth.actions'
 
 @Injectable()
@@ -97,5 +94,17 @@ export class AuthEffects {
         return AuthActions.signInFail({error: payload.error})
       })
     )
+  )
+
+  signOut$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.signOut),
+        tap(() => {
+          localStorage.setItem(this.tokenKey, '')
+          this.router.navigate([UserClientRoutes.SignIn])
+        })
+      ),
+    {dispatch: false}
   )
 }

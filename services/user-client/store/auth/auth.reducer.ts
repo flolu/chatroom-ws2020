@@ -1,13 +1,10 @@
 import {createReducer, on} from '@ngrx/store'
 
 import {
-  initialStatus,
-  loadingDone,
-  loadingFail,
-  loadingStart,
-  StatusState,
+    initialStatus, loadingDone, loadingFail, loadingStart, StatusState
 } from '@libs/client-utils'
 import {PublicUser} from '@libs/schema'
+
 import {AuthActions as Actions} from './auth.actions'
 
 interface Reducer {
@@ -24,7 +21,14 @@ const reducer = createReducer<Reducer>(
 
   on(Actions.signIn, state => ({...state, signInStatus: loadingStart})),
   on(Actions.signInDone, (state, {user}) => ({...state, signInStatus: loadingDone, user})),
-  on(Actions.signInFail, (state, {error}) => ({...state, signInStatus: loadingFail(error)}))
+  on(Actions.signInFail, (state, {error}) => ({...state, signInStatus: loadingFail(error)})),
+
+  on(Actions.signOut, state => ({
+    ...state,
+    user: undefined,
+    signInStatus: initialStatus,
+    status: initialStatus,
+  }))
 )
 
 export {reducer as authReducer, Reducer as AuthReducerState}

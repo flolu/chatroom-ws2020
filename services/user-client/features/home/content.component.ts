@@ -43,8 +43,8 @@ import {debounceTime, takeWhile} from 'rxjs/operators'
 
       <div class="messages" #messages>
         <div *ngFor="let message of messages$ | async" class="item">
-          <div class="content" [class.right]="(user$ | async)!.id === message.fromId">
-            <div class="username" *ngIf="(user$ | async)!.id !== message.fromId">
+          <div class="content" [class.right]="(user$ | async)?.id === message.fromId">
+            <div class="username" *ngIf="(user$ | async)?.id !== message.fromId">
               {{ message.user.username }}
             </div>
             <div class="message_and_time">

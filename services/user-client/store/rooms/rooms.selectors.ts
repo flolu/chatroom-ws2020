@@ -37,6 +37,7 @@ const selectedMessagesWithUser = createSelector(
   (entities, messages) => messages.map(m => ({...m, user: entities[m.fromId]}))
 )
 
+// TODO sort by last message time
 const roomsWithMetadata = createSelector(
   all,
   allMessages,

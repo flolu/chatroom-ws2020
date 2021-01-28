@@ -1,8 +1,9 @@
 import {Component} from '@angular/core'
 import {FormControl, FormGroup, Validators} from '@angular/forms'
 import {Store} from '@ngrx/store'
-
 import {AuthActions, AuthSelectors} from '@store'
+
+// TODO design
 
 @Component({
   selector: 'app-signin',
@@ -23,7 +24,7 @@ export class SigninComponent {
   error$ = this.store.select(AuthSelectors.signInError)
   form = new FormGroup({
     username: new FormControl('', [Validators.required, Validators.minLength(3)]),
-    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
+    password: new FormControl('', [Validators.required, Validators.minLength(3)]),
   })
 
   constructor(private store: Store) {}

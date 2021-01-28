@@ -9,29 +9,10 @@
   height: 100%
 
 .status
-  .connection
-    display: flex
-    align-items: center
-    justify-content: center
-
-    .indicator
-      display: inline-block
-      margin-right: .5rem
-
-    .indicator.good
-      color: green
-
-    .indicator.bad
-      color: var(--error)
-
-    .error
-      color: var(--error)
-
   .warning
     background: orange
-    border-radius: .5rem
-    padding: var(--space)
-    margin-top: var(--space)
+    color: black
+    padding: var(--space-small)
     .title
       font-size: .8rem
       display: flex
@@ -41,34 +22,36 @@
         cursor: pointer
     p
       margin: 0
-      margin-top: 0.5rem
 
   .error
-    background: var(--error)
-    border-radius: .5rem
-    padding: var(--space)
-    margin-top: var(--space)
-
-.user
-  margin: var(--space) 0
-  display: flex
-  flex-direction: column
-  align-items: center
-
-  .avatar
-    width: 4rem
-    height: 4rem
-    font-size: 1.5rem
-    background: darkgrey
-    color: white
-    border-radius: 50%
     display: flex
     align-items: center
     justify-content: center
-    margin-bottom: .5rem
+    background: var(--error)
+    color: white
+    padding: var(--space-small)
+    .indicator
+      margin-right: .5rem
 
-  .username
-    font-weight: bold
+.user
+  display: flex
+  padding: var(--space)
+  background: var(--bg)
+
+  .info
+    display: flex
+    flex-direction: column
+    margin-left: 1rem
+
+    .username
+      color: var(--color)
+
+    .signout
+      font-size: .8rem
+      color: var(--text-dark)
+      cursor: pointer
+      &:hover
+        text-decoration: underline
 
 .create_room_spacer
   height: 6rem

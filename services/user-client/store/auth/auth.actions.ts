@@ -10,6 +10,8 @@ const signIn = createAction('auth.signIn', props<{username: string; password: st
 const signInDone = createAction('auth.signIn.done', props<{user: PublicUser}>())
 const signInFail = createAction('auth.signIn.fail', props<{error: string}>())
 
+const signOut = createAction('auth.signOut')
+
 export const AuthActions = {
   authenticate,
   authenticateDone,
@@ -17,4 +19,5 @@ export const AuthActions = {
   signIn,
   signInDone,
   signInFail,
+  signOut,
 }

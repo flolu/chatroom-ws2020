@@ -1,18 +1,13 @@
-import {FormControl, FormGroup, Validators} from '@angular/forms'
 import {Component, ElementRef, ViewChild} from '@angular/core'
+import {FormControl, FormGroup, Validators} from '@angular/forms'
+import {Actions, ofType} from '@ngrx/effects'
 import {Store} from '@ngrx/store'
+import {
+    LogsActions, LogsSelectors, RoomsActions, RoomsSelectors, UsersActions, UsersSelectors
+} from '@store'
+import {debounceTime, takeWhile} from 'rxjs/operators'
 
 import {Room} from '@libs/schema'
-import {
-  LogsActions,
-  LogsSelectors,
-  RoomsActions,
-  RoomsSelectors,
-  UsersActions,
-  UsersSelectors,
-} from '@store'
-import {Actions, ofType} from '@ngrx/effects'
-import {debounceTime, takeWhile} from 'rxjs/operators'
 
 @Component({
   selector: 'app-home',
@@ -52,7 +47,7 @@ import {debounceTime, takeWhile} from 'rxjs/operators'
         <h3>Users</h3>
         <div *ngFor="let user of onlineUsers$ | async" class="user">
           <div class="content">
-            <app-avatar [user]="user" [online]="true"></app-avatar>
+            <app-avatar [user]="user" [highlighted]="true"></app-avatar>
             <div class="name_and_room">
               <span>{{ user.username }}</span>
               <span class="room" *ngIf="user.room">{{ user.room.name }}</span>
@@ -83,7 +78,7 @@ import {debounceTime, takeWhile} from 'rxjs/operators'
 
         <div *ngFor="let user of offlineUsers$ | async" class="user">
           <div class="content">
-            <app-avatar [user]="user" [online]="false"></app-avatar>
+            <app-avatar [user]="user" [highlighted]="false"></app-avatar>
             <div class="name_and_room">
               <span>{{ user.username }}</span>
             </div>

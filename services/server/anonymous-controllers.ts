@@ -46,7 +46,9 @@ export const authenticateAdmin: MessageController = async (payload: Authenticate
 
 async function getRooms() {
   const collection = await database.roomsCollection()
-  const result = await collection.find({})
+  const result = await collection.find({
+    $or: [{isPrivate: false}, {isPrivate: true, 'privateSettings.isClosed': false}],
+  })
   return (await result.toArray()).map(removeIdProp)
 }
 
