@@ -1,0 +1,115 @@
+:host
+  flex: 1
+  position: relative
+  display: flex
+  flex-direction: column
+  height: 100%
+
+.info
+  padding: var(--space)
+  background: var(--bg-light)
+  display: flex
+  align-items: center
+  border-bottom: 1px solid var(--bg-dark)
+
+  .description
+    display: flex
+    flex-direction: column
+
+    .name
+      margin-right: 1rem
+
+    .type
+      font-size: .8rem
+      color: var(--text-dark)
+
+  .spacer
+    flex: 1
+
+  .close
+    margin-right: 1rem
+
+  .users
+    display: flex
+    justify-content: flex-end
+    gap: 0.5rem
+
+.messages
+  flex: 1
+  padding: var(--space)
+  display: flex
+  flex-direction: column
+  overflow-y: auto
+
+  .item
+    font-size: 1rem
+    margin-bottom: 1rem
+    .content
+      display: inline-block
+      flex-wrap: nowrap
+      padding: .5rem var(--space)
+      border-radius: 2px
+      max-width: 20rem
+      background: var(--bg-light)
+
+      .username
+        font-size: .8rem
+        font-weight: bold
+        color: var(--color)
+
+      .message_and_time
+        display: flex
+        align-items: center
+
+        .time
+          margin-left: 1rem
+          font-size: .7rem
+          color: var(--text-dark)
+
+    .content.right
+      background: var(--bg-hover)
+      margin-left: auto
+      float: right
+
+.input
+  border-top: 1px solid var(--bg-dark)
+  padding: var(--space-small)
+  display: flex
+  background: var(--bg-light)
+
+  input
+    background: rgba(0,0,0,0)
+    flex: 1
+    border: none
+    &:focus
+      border: none
+
+  .send
+    font-size: 2rem
+    padding: .5rem
+    margin-left: .5rem
+    cursor: pointer
+    color: var(--text-dark)
+
+  .send.sendable
+    color: var(--color)
+
+.no_room_selected
+  margin: auto
+  display: flex
+  flex-direction: column
+  align-items: center
+
+  .icon
+    font-size: 7rem
+    width: 7rem
+    height: 7rem
+    color: var(--text-dark)
+
+  .text
+    margin-top: 1rem
+    margin-bottom: .5rem
+
+  .sub_text
+    font-size: .8rem
+    color: var(--text-light)

@@ -1,16 +1,14 @@
 :root
-  --color-rgb: 77, 159, 78
   --color: #30a3e6
   --color-light: #30a3e6
   --color-dark: #0d5985
   --text: #d8d5d3
   --text-light: #4aa3d6
   --text-dark: #6d7d93
-  --bg-light: #2b5278
   --bg: #0e1621
+  --bg-hover: #0e4364
+  --bg-light: #17212b
   --bg-dark: #060a0f
-  --bg-inverse: #17212b
-  --bg-inverse-light: #344236
   --error: #c42121
   --transition-speed: 200ms
   --space-small: .5rem
@@ -30,10 +28,6 @@ body
   flex-direction: column
   min-width: 800px
 
-h1, h2, h3
-  font-family: 'Lora', serif
-  font-weight: normal
-
 ::-webkit-scrollbar
   width: 0.3rem
   height: 0.3rem
@@ -51,9 +45,6 @@ h1, h2, h3
   color: white
   background: var(--color-light)
 
-.unselectable
-  user-select: none
-
 button
   background: var(--color-dark)
   color: var(--text)
@@ -66,11 +57,14 @@ button
     background: var(--color)
 
 input
-  padding: .5rem 1rem
+  padding: .8rem 1rem
   border-radius: 2px
   outline: none
-  border: 1px solid var(--text-dark)
   font-size: 1rem
-  background: var(--bg)
   box-sizing: border-box
   color: var(--text)
+  border: none
+  background: var(--bg)
+  border: 1px solid var(--bg)
+  &:focus
+    border: 1px solid var(--text-dark)

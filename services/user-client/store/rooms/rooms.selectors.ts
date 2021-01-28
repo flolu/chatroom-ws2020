@@ -62,6 +62,21 @@ const roomsWithMetadata = createSelector(
   }
 )
 
+const selectedPartner = createSelector(
+  activeRoom,
+  UsersSelectors.entities,
+  AuthSelectors.user,
+  (room, userEntities, user) => {
+    if (!room) return undefined
+    if (!room.isPrivate) return undefined
+    const partnerId =
+      room.privateSettings!.privateUser1Id === user!.id
+        ? room.privateSettings!.privateUser2Id
+        : room.privateSettings!.privateUser1Id
+    return userEntities[partnerId]
+  }
+)
+
 export const RoomsSelectors = {
   state,
   publicRooms,
@@ -72,4 +87,5 @@ export const RoomsSelectors = {
   offlineUsers,
   selectedMessagesWithUser,
   roomsWithMetadata,
+  selectedPartner,
 }

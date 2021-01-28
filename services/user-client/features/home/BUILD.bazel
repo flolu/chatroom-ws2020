@@ -18,6 +18,11 @@ sass_binary(
     src = "side-panel.component.sass",
 )
 
+sass_binary(
+    name = "content_styles",
+    src = "content.component.sass",
+)
+
 ng_ts_library(
     name = "home",
     srcs = glob(["*.ts"]),
@@ -25,6 +30,7 @@ ng_ts_library(
         "styles",
         "rooms_styles",
         "side_panel_styles",
+        "content_styles",
     ],
     tsconfig = "//services/user-client:tsconfig",
     deps = [

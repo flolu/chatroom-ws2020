@@ -44,9 +44,9 @@ export const joinRoom: MessageController = async (payload: JoinRoom, socket) => 
   const messagesResult = await messageCollection.find({roomId: payload.id}, {sort: {timestamp: 1}})
   const messages = (await messagesResult.toArray()).map(removeIdProp)
 
-  const userIds = messages
-    .map(m => m.fromId)
-    .filter((el, index, self) => index === self.indexOf(el))
+  const userIds = room.isPrivate
+    ? [room.privateSettings!.privateUser1Id, room.privateSettings!.privateUser2Id]
+    : messages.map(m => m.fromId).filter((el, index, self) => index === self.indexOf(el))
   const usersResult = await userCollection.find({id: {$in: userIds}})
   const users = (await usersResult.toArray()).map(removeIdProp)
 
@@ -124,7 +124,7 @@ export const createPrivateRoom: MessageController = async (payload: CreatePrivat
    */
   const room: Room = {
     id: uuidv4(),
-    name: `${creator.username} und ${partner.username}`,
+    name: ``,
     isPrivate: true,
     privateSettings: {
       isClosed: false,

@@ -1,11 +1,11 @@
 import {Component} from '@angular/core'
 import {Router} from '@angular/router'
 import {Actions, ofType} from '@ngrx/effects'
-import {tap} from 'rxjs/operators'
 import {Store} from '@ngrx/store'
+import {UserClientRoutes} from '@shared'
+import {tap} from 'rxjs/operators'
 
 import {WebSocketActions, WebSocketSelectors} from '@libs/client-utils'
-import {UserClientRoutes} from '@shared'
 
 @Component({
   selector: 'app-root',

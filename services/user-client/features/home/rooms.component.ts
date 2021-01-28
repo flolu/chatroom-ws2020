@@ -11,14 +11,18 @@ import {RoomsActions, RoomsSelectors} from '@store'
       [class.selected]="(activeRoomId$ | async) === item.room.id"
       (click)="joinRoom(item.room.id)"
     >
-      <app-avatar *ngIf="item.room.isPrivate" [user]="item.partner" [invserse]="true"> </app-avatar>
+      <app-avatar *ngIf="item.room.isPrivate" [user]="item.partner" [highlighted]="true">
+      </app-avatar>
       <app-room-icon
         *ngIf="!item.room.isPrivate"
         [room]="item.room"
-        [invserse]="true"
+        [highlighted]="true"
       ></app-room-icon>
       <div class="info">
-        <span class="name">{{ item.room.name }}</span>
+        <span class="name">
+          <span *ngIf="item.room.isPrivate">{{ item.partner?.username }}</span>
+          <span *ngIf="!item.room.isPrivate">{{ item.room.name }}</span>
+        </span>
         <span class="message">{{ item.lastMessage?.message }}</span>
       </div>
     </div>

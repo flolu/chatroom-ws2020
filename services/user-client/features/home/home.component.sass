@@ -1,73 +1,7 @@
-.container
+:host
   position: fixed
   top: 0
   left: 0
   right: 0
   bottom: 0
   display: flex
-
-.content
-  flex: 1
-  position: relative
-  display: flex
-  flex-direction: column
-
-  .info
-    padding: var(--space)
-    background: var(--bg)
-    display: flex
-    align-items: center
-    border-bottom: 1px solid var(--bg-dark)
-
-    .name
-      margin-right: 1rem
-
-    .users
-      flex: 1
-      display: flex
-      justify-content: flex-end
-      gap: 0.5rem
-
-  .messages
-    flex: 1
-    padding: var(--space)
-    display: flex
-    flex-direction: column
-    overflow-y: auto
-
-    .item
-      font-size: 1rem
-      margin-bottom: 1rem
-      .content
-        display: inline-block
-        flex-wrap: nowrap
-        padding: .5rem var(--space)
-        border-radius: .5rem
-        max-width: 20rem
-        background: var(--bg-dark)
-        .username
-          font-size: .8rem
-          font-weight: bold
-
-      .content.right
-        margin-left: auto
-        float: right
-
-  .input
-    border-top: 1px solid var(--bg-dark)
-    padding: var(--space)
-    display: flex
-    background: var(--bg)
-
-    input
-      font-size: 1.2rem
-      flex: 1
-      border: none
-      outline: none
-      border-radius: .5rem
-      padding: 0 var(--space)
-
-    .send
-      font-size: 2rem
-      padding: .5rem
-      cursor: pointer
