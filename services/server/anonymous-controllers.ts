@@ -4,25 +4,16 @@ import {v4 as uuidv4} from 'uuid'
 import {removeIdProp} from '@libs/common'
 import {OutgoingClientMessageType, OutgoingServerMessageType} from '@libs/enums'
 import {
-  AuthenticateAdmin,
-  AuthenticatedAdmin,
-  AuthenticateFail,
-  AuthenticateRequest,
-  AuthenticateSuccess,
-  ListRooms,
-  ListUsers,
-  SignInFail,
-  SignInRequest,
-  SignInSuccess,
-  User,
-  UserCreated,
-  UserWentOnline,
+    AuthenticateAdmin, AuthenticatedAdmin, AuthenticateFail, AuthenticateRequest,
+    AuthenticateSuccess, ListRooms, ListUsers, SignInFail, SignInRequest, SignInSuccess, User,
+    UserCreated, UserWentOnline
 } from '@libs/schema'
+
+import {AuthToken} from './auth-token'
 import {config} from './config'
 import {database} from './database'
 import {AugmentedSocket, MessageController, serverState} from './socket-controller'
 import {buildSocketMessage} from './socket-message'
-import {AuthToken} from './auth-token'
 
 export const authenticateAdmin: MessageController = async (payload: AuthenticateAdmin, socket) => {
   if (payload.secret === config.adminSecret) {
@@ -36,6 +27,8 @@ export const authenticateAdmin: MessageController = async (payload: Authenticate
     socket.send(authenticatedMessage)
 
     const rooms = await getRooms()
+
+    // TODO maybe also show private rooms in server client?!
     const roomsMessage = buildSocketMessage<ListRooms>(OutgoingServerMessageType.ListRooms, {rooms})
     socket.send(roomsMessage)
 
@@ -164,8 +157,19 @@ function userWentOnline(userId: string, socket: AugmentedSocket) {
 
 async function initializeUser(socket: AugmentedSocket) {
   const roomsCollection = await database.roomsCollection()
-  const rooms = await roomsCollection.find({})
-  const payload: ListRooms = {rooms: (await rooms.toArray()).map(removeIdProp)}
+  const publicRoomsResult = await roomsCollection.find({isPrivate: false})
+  console.log('socket.userId', socket.userId)
+  const privateRoomsResult = await roomsCollection.find({
+    isPrivate: true,
+    'privateSettings.isClosed': false,
+    $or: [
+      {'privateSettings.privateUser1Id': socket.userId},
+      {'privateSettings.privateUser2Id': socket.userId},
+    ],
+  })
+  const publicRooms = (await publicRoomsResult.toArray()).map(removeIdProp)
+  const privateRooms = (await privateRoomsResult.toArray()).map(removeIdProp)
+  const payload: ListRooms = {rooms: [...publicRooms, ...privateRooms]}
   const roomsMessage = buildSocketMessage(OutgoingClientMessageType.ListRooms, payload)
   socket.send(roomsMessage)
 }

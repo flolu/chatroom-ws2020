@@ -26,9 +26,13 @@ const messagesWithUser = createSelector(UsersSelectors.entities, messages, (enti
   messages.map(m => ({...m, user: entities[m.fromId]}))
 )
 
+const publicRooms = createSelector(all, rooms => rooms.filter(r => !r.isPrivate))
+const privateRooms = createSelector(all, rooms => rooms.filter(r => r.isPrivate))
+
 export const RoomsSelectors = {
   state,
-  all,
+  publicRooms,
+  privateRooms,
   activeRoomId,
   activeRoom,
   onlineUsers,

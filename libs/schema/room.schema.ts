@@ -4,6 +4,12 @@ import {PublicUser} from './user.schema'
 export interface Room {
   id: string
   name: string
+  isPrivate: boolean
+  privateSettings?: {
+    privateUser1Id: string
+    privateUser2Id: string
+    isClosed: boolean
+  }
 }
 
 export interface CreateRoom {
@@ -32,4 +38,21 @@ export interface JoinedRoom {
   messages: Message[]
   users: PublicUser[]
   onlineUserIds: string[]
+}
+
+export interface CreatePrivateRoom {
+  username: string
+}
+
+export interface ClosePrivateRoom {
+  id: string
+}
+
+export interface PrivateRoomCreated {
+  room: Room
+  partner: PublicUser
+}
+
+export interface PrivateRoomClosed {
+  id: string
 }

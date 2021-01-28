@@ -1,19 +1,18 @@
-import * as WebSocket from 'ws'
 import * as fs from 'fs'
 import * as path from 'path'
+import * as WebSocket from 'ws'
 
-import {NetworkLog, SocketMessage, UserWentOffline} from '@libs/schema'
 import {
-  IncomingClientMessageeType,
-  IncomingServerMessageType,
-  OutgoingClientMessageType,
-  OutgoingServerMessageType,
+    IncomingClientMessageeType, IncomingServerMessageType, OutgoingClientMessageType,
+    OutgoingServerMessageType
 } from '@libs/enums'
-import {createRoom, deleteRoom, editRoom} from './server-room-controllers'
+import {NetworkLog, SocketMessage, UserWentOffline} from '@libs/schema'
+
 import {authenticateAdmin, authenticateUser, signInUser} from './anonymous-controllers'
-import {buildSocketMessage} from './socket-message'
+import {closePrivateRoom, createPrivateRoom, joinRoom, sendMessage} from './client-room-controllers'
 import {banUser, kickUser, warnUser} from './push-user-controllers'
-import {joinRoom, sendMessage} from './client-room-controllers'
+import {createRoom, deleteRoom, editRoom} from './server-room-controllers'
+import {buildSocketMessage} from './socket-message'
 
 export type MessageController = (payload: any, socket: AugmentedSocket) => void
 
@@ -30,6 +29,8 @@ const adminControllers: Record<string, MessageController> = {
 const userControllers: Record<string, MessageController> = {
   [IncomingClientMessageeType.JoinRoom]: joinRoom,
   [IncomingClientMessageeType.SendMessage]: sendMessage,
+  [IncomingClientMessageeType.CreatePrivateRoom]: createPrivateRoom,
+  [IncomingClientMessageeType.ClosePrivateRoom]: closePrivateRoom,
 }
 
 const anonymousControllers: Record<string, MessageController> = {

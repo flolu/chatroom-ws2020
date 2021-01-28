@@ -43,6 +43,9 @@ export enum IncomingClientMessageeType {
 
   JoinRoom = 'rooms.join',
   SendMessage = 'rooms.message',
+
+  CreatePrivateRoom = 'rooms.createPrivate',
+  ClosePrivateRoom = 'rooms.closePrivate',
 }
 
 /**
@@ -64,4 +67,7 @@ export enum OutgoingClientMessageType {
   IncomingMessage = 'client.rooms.message',
   UserJoinedRoom = 'client.rooms.userJoined',
   UserLeftRoom = 'client.rooms.userLeft',
+
+  PrivateRoomCreated = 'client.rooms.privateCreated',
+  PrivateRoomClosed = 'client.rooms.privateClosed',
 }

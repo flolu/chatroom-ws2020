@@ -2,7 +2,11 @@ import {v4 as uuidv4} from 'uuid'
 
 import {removeIdProp} from '@libs/common'
 import {OutgoingClientMessageType, OutgoingServerMessageType} from '@libs/enums'
-import {JoinedRoom, JoinRoom, Message, UserJoinedRoom, UserLeftRoom} from '@libs/schema'
+import {
+    ClosePrivateRoom, CreatePrivateRoom, JoinedRoom, JoinRoom, Message, PrivateRoomClosed,
+    PrivateRoomCreated, Room, UserJoinedRoom, UserLeftRoom
+} from '@libs/schema'
+
 import {database} from './database'
 import {broadcastToRoom, MessageController, serverState} from './socket-controller'
 import {buildSocketMessage} from './socket-message'
@@ -14,7 +18,16 @@ export const joinRoom: MessageController = async (payload: JoinRoom, socket) => 
 
   if (socket.roomId === payload.id) return
 
-  const {passwordHash, ...publicUser} = user
+  const roomCollection = await database.roomsCollection()
+  const room = await roomCollection.findOne({id: payload.id})
+  if (!room) return
+  if (room.isPrivate && room.privateSettings?.isClosed) return
+  if (
+    room.isPrivate &&
+    room.privateSettings?.privateUser1Id !== socket.userId &&
+    room.privateSettings?.privateUser2Id !== socket.userId
+  )
+    return
 
   if (socket.roomId) {
     const leaveMessage = buildSocketMessage(OutgoingClientMessageType.UserLeftRoom, socket.userId)
@@ -57,6 +70,7 @@ export const joinRoom: MessageController = async (payload: JoinRoom, socket) => 
     serverState.adminSocket.send(serverJoinMessage)
   }
 
+  const {passwordHash, ...publicUser} = user
   const joinMessage = buildSocketMessage(
     OutgoingClientMessageType.UserJoinedRoom,
     removeIdProp(publicUser)
@@ -80,4 +94,93 @@ export const sendMessage: MessageController = async (payload: string, socket) =>
 
   const chatMessage = buildSocketMessage(OutgoingClientMessageType.IncomingMessage, inserted)
   broadcastToRoom(chatMessage, socket.roomId)
+}
+
+export const createPrivateRoom: MessageController = async (payload: CreatePrivateRoom, socket) => {
+  if (!socket.userId) return
+  const userCollection = await database.usersCollection()
+
+  const creator = await userCollection.findOne({id: socket.userId})
+  const partner = await userCollection.findOne({username: payload.username})
+  if (!creator || !partner) return
+
+  /**
+   * Don't create a new private room if there is still
+   * an open private room between the two users
+   */
+  const roomCollection = await database.roomsCollection()
+  const existing = await roomCollection.findOne({
+    isPrivate: true,
+    'privateSettings.isClosed': false,
+    $or: [
+      {'privateSettings.privateUser1Id': creator.id, 'privateSettings.privateUser2Id': partner.id},
+      {'privateSettings.privateUser1Id': partner.id, 'privateSettings.privateUser2Id': creator.id},
+    ],
+  })
+  if (existing) return
+
+  /**
+   * Persist room to the database
+   */
+  const room: Room = {
+    id: uuidv4(),
+    name: `[Private] ${creator.username} <-> ${partner.username}`,
+    isPrivate: true,
+    privateSettings: {
+      isClosed: false,
+      privateUser1Id: creator.id,
+      privateUser2Id: partner.id,
+    },
+  }
+  const result = await roomCollection.insertOne(room)
+
+  /**
+   * Notify both clients about the creation of
+   * the private room
+   */
+  const createdCreatorMessage = buildSocketMessage<PrivateRoomCreated>(
+    OutgoingClientMessageType.PrivateRoomCreated,
+    {room, partner}
+  )
+  socket.send(createdCreatorMessage)
+  const createdParnerMessage = buildSocketMessage<PrivateRoomCreated>(
+    OutgoingClientMessageType.PrivateRoomCreated,
+    {room, partner: creator}
+  )
+  const partnerSocket = serverState.onlineUsers.get(partner.id)
+  if (partnerSocket) partnerSocket.send(createdParnerMessage)
+}
+
+export const closePrivateRoom: MessageController = async (payload: ClosePrivateRoom, socket) => {
+  if (!socket.userId) return
+
+  const roomCollection = await database.roomsCollection()
+  const room = await roomCollection.findOne({id: payload.id})
+  if (!room) return
+  if (!room.isPrivate) return
+  if (room.privateSettings?.isClosed) return
+  if (
+    socket.userId !== room.privateSettings?.privateUser1Id &&
+    socket.userId !== room.privateSettings?.privateUser2Id
+  )
+    return
+
+  await roomCollection.findOneAndUpdate({id: room.id}, {$set: {'privateSettings.isClosed': true}})
+
+  /**
+   * Notify both clients that the private room has
+   * been closed
+   */
+  const userCollection = await database.usersCollection()
+  const user1 = await userCollection.findOne({id: room.privateSettings.privateUser1Id})
+  const user2 = await userCollection.findOne({id: room.privateSettings.privateUser2Id})
+
+  const closedMessage = buildSocketMessage<PrivateRoomClosed>(
+    OutgoingClientMessageType.PrivateRoomClosed,
+    {id: room.id}
+  )
+  const user1Socket = serverState.onlineUsers.get(user1!.id)
+  if (user1Socket) user1Socket.send(closedMessage)
+  const user2Socket = serverState.onlineUsers.get(user2!.id)
+  if (user2Socket) user2Socket.send(closedMessage)
 }

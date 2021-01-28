@@ -1,10 +1,11 @@
 import {v4 as uuidv4} from 'uuid'
 
-import {CreateRoom, DeleteRoom, EditRoom, Room} from '@libs/schema'
 import {removeIdProp} from '@libs/common'
 import {OutgoingClientMessageType, OutgoingServerMessageType} from '@libs/enums'
-import {broadcastMessage, MessageController} from './socket-controller'
+import {CreateRoom, DeleteRoom, EditRoom, Room} from '@libs/schema'
+
 import {database} from './database'
+import {broadcastMessage, MessageController} from './socket-controller'
 import {buildSocketMessage} from './socket-message'
 
 export const createRoom: MessageController = async (payload: CreateRoom, socket) => {
@@ -12,6 +13,8 @@ export const createRoom: MessageController = async (payload: CreateRoom, socket)
   const room: Room = {
     id: uuidv4(),
     name: payload.name,
+    isPrivate: false,
+    privateSettings: undefined,
   }
   const result = await collection.insertOne(room)
   const inserted = removeIdProp(result.ops[0])

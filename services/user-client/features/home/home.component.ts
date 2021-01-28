@@ -1,10 +1,10 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core'
-import {Store} from '@ngrx/store'
 import {Actions, ofType} from '@ngrx/effects'
+import {Store} from '@ngrx/store'
+import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors} from '@store'
 import {debounceTime, takeWhile} from 'rxjs/operators'
 
 import {WebSocketSelectors} from '@libs/client-utils'
-import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors} from '@store'
 
 @Component({
   selector: 'app-home',
@@ -42,8 +42,20 @@ import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors}
         </div>
 
         <div class="rooms">
+          <h3>Private Rooms</h3>
+          <input placeholder="Partner Username" [(ngModel)]="parnterUsername" />
+          <button (click)="createPrivateRoom()">Create Private Room</button>
           <div
-            *ngFor="let room of rooms$ | async"
+            *ngFor="let room of privateRooms$ | async"
+            class="item"
+            [class.selected]="(activeRoomId$ | async) === room.id"
+            (click)="joinRoom(room.id)"
+          >
+            <span>{{ room.name }}</span>
+          </div>
+          <h3>Public Rooms</h3>
+          <div
+            *ngFor="let room of publicRooms$ | async"
             class="item"
             [class.selected]="(activeRoomId$ | async) === room.id"
             (click)="joinRoom(room.id)"
@@ -75,8 +87,8 @@ import {AuthSelectors, PushActions, PushSelectors, RoomsActions, RoomsSelectors}
 
         <div class="messages" #messages>
           <div *ngFor="let message of messages$ | async" class="item">
-            <div class="content" [class.right]="(user$ | async).id === message.fromId">
-              <div class="username" *ngIf="(user$ | async).id !== message.fromId">
+            <div class="content" [class.right]="(user$ | async)!.id === message.fromId">
+              <div class="username" *ngIf="(user$ | async)!.id !== message.fromId">
                 {{ message.user.username }}
               </div>
               <div class="message">{{ message.message }}</div>
@@ -103,7 +115,8 @@ export class HomeComponent implements OnDestroy {
   isConnected$ = this.store.select(WebSocketSelectors.isConnected)
   connectionError$ = this.store.select(WebSocketSelectors.error)
   warnMessage$ = this.store.select(PushSelectors.warnMessage)
-  rooms$ = this.store.select(RoomsSelectors.all)
+  publicRooms$ = this.store.select(RoomsSelectors.publicRooms)
+  privateRooms$ = this.store.select(RoomsSelectors.privateRooms)
   activeRoom$ = this.store.select(RoomsSelectors.activeRoom)
   activeRoomId$ = this.store.select(RoomsSelectors.activeRoomId)
   onlineUsers$ = this.store.select(RoomsSelectors.onlineUsers)
@@ -111,6 +124,7 @@ export class HomeComponent implements OnDestroy {
   messages$ = this.store.select(RoomsSelectors.messagesWithUser)
   user$ = this.store.select(AuthSelectors.user)
   messageInput = ''
+  parnterUsername = ''
   private alive = true
 
   constructor(private store: Store, private actions$: Actions) {
@@ -147,6 +161,11 @@ export class HomeComponent implements OnDestroy {
   sendMessage() {
     this.store.dispatch(RoomsActions.sendMessage({message: this.messageInput}))
     this.messageInput = ''
+  }
+
+  createPrivateRoom() {
+    this.store.dispatch(RoomsActions.createPrivate({username: this.parnterUsername}))
+    this.parnterUsername = ''
   }
 
   ngOnDestroy() {

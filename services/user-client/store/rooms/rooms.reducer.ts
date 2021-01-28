@@ -2,6 +2,7 @@ import {createEntityAdapter, EntityState} from '@ngrx/entity'
 import {createReducer, on} from '@ngrx/store'
 
 import {Message, Room} from '@libs/schema'
+
 import {RoomsActions as Actions} from './rooms.actions'
 
 interface Reducer extends EntityState<Room> {
@@ -40,7 +41,10 @@ const reducer = createReducer<Reducer>(
   on(Actions.incomingMessage, (state, {message}) => ({
     ...state,
     messages: [...state.messages, message],
-  }))
+  })),
+
+  on(Actions.privateCreated, (state, {room}) => adapter.upsertOne(room, state)),
+  on(Actions.privateClosed, (state, {id}) => adapter.removeOne(id, state))
 )
 
 export {reducer as roomsReducer, Reducer as RoomsReducerState, adapter as roomsAdapter}

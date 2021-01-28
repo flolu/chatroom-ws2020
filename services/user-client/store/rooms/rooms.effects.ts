@@ -2,9 +2,13 @@ import {Injectable} from '@angular/core'
 import {Actions, createEffect, ofType} from '@ngrx/effects'
 import {filter, map} from 'rxjs/operators'
 
-import {JoinedRoom, JoinRoom, ListRooms, Message, PublicUser, Room} from '@libs/schema'
-import {IncomingClientMessageeType, OutgoingClientMessageType} from '@libs/enums'
 import {WebSocketActions} from '@libs/client-utils'
+import {IncomingClientMessageeType, OutgoingClientMessageType} from '@libs/enums'
+import {
+    ClosePrivateRoom, CreatePrivateRoom, JoinedRoom, JoinRoom, ListRooms, Message,
+    PrivateRoomClosed, PrivateRoomCreated, PublicUser, Room
+} from '@libs/schema'
+
 import {RoomsActions} from './rooms.actions'
 
 @Injectable()
@@ -15,7 +19,10 @@ export class RoomsEffects {
     this.actions$.pipe(
       ofType(WebSocketActions.message),
       filter(({messageType}) => messageType === OutgoingClientMessageType.ListRooms),
-      map(({payload}) => RoomsActions.list({rooms: (payload as ListRooms).rooms}))
+      map(({payload}) => {
+        const {rooms} = payload as ListRooms
+        return RoomsActions.list({rooms})
+      })
     )
   )
 
@@ -96,6 +103,54 @@ export class RoomsEffects {
           messageType: IncomingClientMessageeType.SendMessage,
           payload: message,
         })
+      })
+    )
+  )
+
+  createPrivate$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(RoomsActions.createPrivate),
+      map(({username}) => {
+        const payload: CreatePrivateRoom = {username}
+        return WebSocketActions.send({
+          messageType: IncomingClientMessageeType.CreatePrivateRoom,
+          payload,
+        })
+      })
+    )
+  )
+
+  closePrivate$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(RoomsActions.closePrivate),
+      map(({id}) => {
+        const payload: ClosePrivateRoom = {id}
+        return WebSocketActions.send({
+          messageType: IncomingClientMessageeType.ClosePrivateRoom,
+          payload,
+        })
+      })
+    )
+  )
+
+  privateCreated$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingClientMessageType.PrivateRoomCreated),
+      map(({payload}) => {
+        const {room, partner} = payload as PrivateRoomCreated
+        return RoomsActions.privateCreated({room, partner})
+      })
+    )
+  )
+
+  privateClosed$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WebSocketActions.message),
+      filter(({messageType}) => messageType === OutgoingClientMessageType.PrivateRoomClosed),
+      map(({payload}) => {
+        const {id} = payload as PrivateRoomClosed
+        return RoomsActions.privateClosed({id})
       })
     )
   )

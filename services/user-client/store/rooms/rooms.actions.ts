@@ -23,6 +23,14 @@ const userJoined = createAction('rooms.userJoined', props<{user: PublicUser}>())
 const userLeft = createAction('rooms.userLeft', props<{userId: string}>())
 const incomingMessage = createAction('rooms.incomingMessage', props<{message: Message}>())
 
+const createPrivate = createAction('rooms.createPrivate', props<{username: string}>())
+const closePrivate = createAction('rooms.closePrivate', props<{id: string}>())
+const privateCreated = createAction(
+  'rooms.privateCreated',
+  props<{room: Room; partner: PublicUser}>()
+)
+const privateClosed = createAction('rooms.privateClosed', props<{id: string}>())
+
 export const RoomsActions = {
   list,
   created,
@@ -34,4 +42,8 @@ export const RoomsActions = {
   userLeft,
   incomingMessage,
   sendMessage,
+  createPrivate,
+  closePrivate,
+  privateCreated,
+  privateClosed,
 }
