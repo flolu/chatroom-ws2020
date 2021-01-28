@@ -7,6 +7,7 @@ import {SharedUIModule} from '@libs/shared-ui'
 
 import {HomeComponent} from './home.component'
 import {RoomsCopmonent} from './rooms.component'
+import {SidePanelComponent} from './side-panel.component'
 
 @NgModule({
   imports: [
@@ -16,6 +17,6 @@ import {RoomsCopmonent} from './rooms.component'
     RouterModule.forChild([{path: '', component: HomeComponent}]),
     SharedUIModule,
   ],
-  declarations: [HomeComponent, RoomsCopmonent],
+  declarations: [HomeComponent, RoomsCopmonent, SidePanelComponent],
 })
 export class HomeModule {}

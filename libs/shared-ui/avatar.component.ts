@@ -4,7 +4,7 @@ import {PublicUser} from '@libs/schema'
 
 @Component({
   selector: 'app-avatar',
-  template: ` <div [title]="user?.username" [class.online]="online">
+  template: ` <div [title]="user?.username" [class.online]="online" [class.inverse]="invserse">
     <span>{{ user?.username.charAt(0).toUpperCase() }}</span>
   </div>`,
   styleUrls: ['avatar.component.sass'],
@@ -12,4 +12,5 @@ import {PublicUser} from '@libs/schema'
 export class AvatarComponent {
   @Input() user: PublicUser
   @Input() online: boolean
+  @Input() invserse: boolean
 }

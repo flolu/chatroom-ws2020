@@ -124,7 +124,7 @@ export const createPrivateRoom: MessageController = async (payload: CreatePrivat
    */
   const room: Room = {
     id: uuidv4(),
-    name: `[Private] ${creator.username} <-> ${partner.username}`,
+    name: `${creator.username} und ${partner.username}`,
     isPrivate: true,
     privateSettings: {
       isClosed: false,

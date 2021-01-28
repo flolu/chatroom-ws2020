@@ -1,14 +1,16 @@
 :root
   --color-rgb: 77, 159, 78
-  --color: #4d9f4e
-  --color-light: #7ed17c
-  --color-dark: #186f24
-  --text: #38424e
-  --text-light: #777e85
-  --text-dark: #18222e
-  --bg-light: #ffff
-  --bg: #fdfdfd
-  --bg-dark: #f3f3f3
+  --color: #30a3e6
+  --color-light: #30a3e6
+  --color-dark: #0d5985
+  --text: #d8d5d3
+  --text-light: #4aa3d6
+  --text-dark: #6d7d93
+  --bg-light: #2b5278
+  --bg: #0e1621
+  --bg-dark: #060a0f
+  --bg-inverse: #17212b
+  --bg-inverse-light: #344236
   --error: #c42121
   --transition-speed: 200ms
   --space-small: .5rem
@@ -22,7 +24,8 @@ body
   padding: 0
   font-family: 'Open Sans', sans-serif
   font-size: 18px
-  background: var(--bg-light)
+  background: var(--bg)
+  color: var(--text)
   display: flex
   flex-direction: column
   min-width: 800px
@@ -50,3 +53,24 @@ h1, h2, h3
 
 .unselectable
   user-select: none
+
+button
+  background: var(--color-dark)
+  color: var(--text)
+  border: none
+  border-radius: 2px
+  cursor: pointer
+  padding: .5rem 1rem
+  font-size: 1rem
+  &:hover
+    background: var(--color)
+
+input
+  padding: .5rem 1rem
+  border-radius: 2px
+  outline: none
+  border: 1px solid var(--text-dark)
+  font-size: 1rem
+  background: var(--bg)
+  box-sizing: border-box
+  color: var(--text)
