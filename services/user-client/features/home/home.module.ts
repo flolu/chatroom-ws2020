@@ -1,10 +1,12 @@
-import {NgModule} from '@angular/core'
 import {CommonModule} from '@angular/common'
-import {RouterModule} from '@angular/router'
+import {NgModule} from '@angular/core'
 import {FormsModule, ReactiveFormsModule} from '@angular/forms'
+import {RouterModule} from '@angular/router'
 
 import {SharedUIModule} from '@libs/shared-ui'
+
 import {HomeComponent} from './home.component'
+import {RoomsCopmonent} from './rooms.component'
 
 @NgModule({
   imports: [
@@ -14,6 +16,6 @@ import {HomeComponent} from './home.component'
     RouterModule.forChild([{path: '', component: HomeComponent}]),
     SharedUIModule,
   ],
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, RoomsCopmonent],
 })
 export class HomeModule {}

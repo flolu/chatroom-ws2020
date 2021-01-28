@@ -41,28 +41,7 @@ import {WebSocketSelectors} from '@libs/client-utils'
           <div class="username">{{ user.username }}</div>
         </div>
 
-        <div class="rooms">
-          <h3>Private Rooms</h3>
-          <input placeholder="Partner Username" [(ngModel)]="parnterUsername" />
-          <button (click)="createPrivateRoom()">Create Private Room</button>
-          <div
-            *ngFor="let room of privateRooms$ | async"
-            class="item"
-            [class.selected]="(activeRoomId$ | async) === room.id"
-            (click)="joinRoom(room.id)"
-          >
-            <span>{{ room.name }}</span>
-          </div>
-          <h3>Public Rooms</h3>
-          <div
-            *ngFor="let room of publicRooms$ | async"
-            class="item"
-            [class.selected]="(activeRoomId$ | async) === room.id"
-            (click)="joinRoom(room.id)"
-          >
-            <span>{{ room.name }}</span>
-          </div>
-        </div>
+        <app-rooms></app-rooms>
       </div>
 
       <div class="content" *ngIf="activeRoom$ | async as room">
@@ -118,8 +97,6 @@ export class HomeComponent implements OnDestroy {
   isConnected$ = this.store.select(WebSocketSelectors.isConnected)
   connectionError$ = this.store.select(WebSocketSelectors.error)
   warnMessage$ = this.store.select(PushSelectors.warnMessage)
-  publicRooms$ = this.store.select(RoomsSelectors.publicRooms)
-  privateRooms$ = this.store.select(RoomsSelectors.privateRooms)
   activeRoom$ = this.store.select(RoomsSelectors.activeRoom)
   activeRoomId$ = this.store.select(RoomsSelectors.activeRoomId)
   onlineUsers$ = this.store.select(RoomsSelectors.onlineUsers)
@@ -127,7 +104,6 @@ export class HomeComponent implements OnDestroy {
   messages$ = this.store.select(RoomsSelectors.messagesWithUser)
   user$ = this.store.select(AuthSelectors.user)
   messageInput = ''
-  parnterUsername = ''
   private alive = true
 
   constructor(private store: Store, private actions$: Actions) {
@@ -157,18 +133,9 @@ export class HomeComponent implements OnDestroy {
     this.store.dispatch(PushActions.readWarnMessage())
   }
 
-  joinRoom(id: string) {
-    this.store.dispatch(RoomsActions.join({id}))
-  }
-
   sendMessage() {
     this.store.dispatch(RoomsActions.sendMessage({message: this.messageInput}))
     this.messageInput = ''
-  }
-
-  createPrivateRoom() {
-    this.store.dispatch(RoomsActions.createPrivate({username: this.parnterUsername}))
-    this.parnterUsername = ''
   }
 
   closeRoom(id: string) {
