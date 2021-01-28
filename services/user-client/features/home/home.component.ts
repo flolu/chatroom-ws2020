@@ -101,7 +101,7 @@ export class HomeComponent implements OnDestroy {
   activeRoomId$ = this.store.select(RoomsSelectors.activeRoomId)
   onlineUsers$ = this.store.select(RoomsSelectors.onlineUsers)
   offlineUsers$ = this.store.select(RoomsSelectors.offlineUsers)
-  messages$ = this.store.select(RoomsSelectors.messagesWithUser)
+  messages$ = this.store.select(RoomsSelectors.selectedMessagesWithUser)
   user$ = this.store.select(AuthSelectors.user)
   messageInput = ''
   private alive = true

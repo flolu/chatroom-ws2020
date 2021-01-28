@@ -27,6 +27,8 @@ export interface DeleteRoom {
 
 export interface ListRooms {
   rooms: Room[]
+  messages: Message[]
+  users: PublicUser[]
 }
 
 export interface JoinRoom {

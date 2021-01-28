@@ -15,10 +15,18 @@ sass_binary(
     src = "avatar.component.sass",
 )
 
+sass_binary(
+    name = "room_icon_styles",
+    src = "room-icon.component.sass",
+)
+
 ng_ts_library(
     name = "shared-ui",
     srcs = glob(["*.ts"]),
-    angular_assets = ["avatar_styles"],
+    angular_assets = [
+        "avatar_styles",
+        "room_icon_styles",
+    ],
     module_name = "@libs/shared-ui",
     tsconfig = "tsconfig",
     deps = [

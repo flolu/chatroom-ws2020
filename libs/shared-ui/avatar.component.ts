@@ -4,8 +4,8 @@ import {PublicUser} from '@libs/schema'
 
 @Component({
   selector: 'app-avatar',
-  template: ` <div [title]="user.username" [class.online]="online">
-    <span>{{ user.username.charAt(0).toUpperCase() }}</span>
+  template: ` <div [title]="user?.username" [class.online]="online">
+    <span>{{ user?.username.charAt(0).toUpperCase() }}</span>
   </div>`,
   styleUrls: ['avatar.component.sass'],
 })

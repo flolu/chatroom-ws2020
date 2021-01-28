@@ -11,6 +11,7 @@
     "paths": {
       "@libs/*": ["../../libs/*"],
       "@store": ["./store"],
+      "@store/*": ["./store/*"],
       "@services": ["./services"],
       "@guards": ["./guards"],
       "@shared": ["./shared"]

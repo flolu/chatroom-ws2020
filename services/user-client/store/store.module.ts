@@ -3,9 +3,10 @@ import {EffectsModule} from '@ngrx/effects'
 import {StoreModule} from '@ngrx/store'
 
 import {WebSocketEffects, websocketReducer} from '@libs/client-utils'
-import {authReducer, AuthEffects} from './auth'
+
+import {AuthEffects, authReducer} from './auth'
 import {PushEffects, pushReducer} from './push'
-import {RoomsEffects, roomsReducer} from './rooms'
+import {messagesReducer, RoomsEffects, roomsReducer} from './rooms'
 import {usersReducer} from './users'
 
 @NgModule({
@@ -16,6 +17,7 @@ import {usersReducer} from './users'
       push: pushReducer,
       rooms: roomsReducer,
       users: usersReducer,
+      messages: messagesReducer,
     }),
     EffectsModule.forRoot([AuthEffects, WebSocketEffects, PushEffects, RoomsEffects]),
   ],

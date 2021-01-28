@@ -12,7 +12,8 @@ const reducer = createReducer<Reducer>(
   adapter.getInitialState(),
   on(RoomsActions.joined, (state, {users}) => adapter.upsertMany(users, state)),
   on(RoomsActions.userJoined, (state, {user}) => adapter.upsertOne(user, state)),
-  on(RoomsActions.privateCreated, (state, {partner}) => adapter.upsertOne(partner, state))
+  on(RoomsActions.privateCreated, (state, {partner}) => adapter.upsertOne(partner, state)),
+  on(RoomsActions.list, (state, {users}) => adapter.upsertMany(users, state))
 )
 
 export {reducer as usersReducer, Reducer as UserReducerState, adapter as usersAdapter}

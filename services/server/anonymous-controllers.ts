@@ -26,15 +26,21 @@ export const authenticateAdmin: MessageController = async (payload: Authenticate
     )
     socket.send(authenticatedMessage)
 
-    const rooms = await getRooms()
-
-    const roomsMessage = buildSocketMessage<ListRooms>(OutgoingServerMessageType.ListRooms, {rooms})
-    socket.send(roomsMessage)
-
     const users = await getUsers()
     const payload: ListUsers = {users, onlineUserIds: Array.from(serverState.onlineUsers.keys())}
     const usersMessage = buildSocketMessage<ListUsers>(OutgoingServerMessageType.ListUsers, payload)
     socket.send(usersMessage)
+
+    const rooms = await getRooms()
+    const messageCollection = await database.messagesCollection()
+    const messagesResult = await messageCollection.find({roomId: {$in: rooms.map(r => r.id)}})
+    const messages = await (await messagesResult.toArray()).map(removeIdProp)
+    const roomsMessage = buildSocketMessage<ListRooms>(OutgoingServerMessageType.ListRooms, {
+      rooms,
+      messages,
+      users: [],
+    })
+    socket.send(roomsMessage)
   }
 }
 
@@ -46,7 +52,7 @@ async function getRooms() {
 
 async function getUsers() {
   const collection = await database.usersCollection()
-  const result = await collection.find({})
+  const result = await collection.find()
   return (await result.toArray())
     .map(removeIdProp)
     .map(({passwordHash, ...publicUser}) => publicUser)
@@ -157,7 +163,6 @@ function userWentOnline(userId: string, socket: AugmentedSocket) {
 async function initializeUser(socket: AugmentedSocket) {
   const roomsCollection = await database.roomsCollection()
   const publicRoomsResult = await roomsCollection.find({isPrivate: false})
-  console.log('socket.userId', socket.userId)
   const privateRoomsResult = await roomsCollection.find({
     isPrivate: true,
     'privateSettings.isClosed': false,
@@ -168,7 +173,12 @@ async function initializeUser(socket: AugmentedSocket) {
   })
   const publicRooms = (await publicRoomsResult.toArray()).map(removeIdProp)
   const privateRooms = (await privateRoomsResult.toArray()).map(removeIdProp)
-  const payload: ListRooms = {rooms: [...publicRooms, ...privateRooms]}
+  const rooms = [...publicRooms, ...privateRooms]
+  const messageCollection = await database.messagesCollection()
+  const messagesResult = await messageCollection.find({roomId: {$in: rooms.map(r => r.id)}})
+  const messages = await (await messagesResult.toArray()).map(removeIdProp)
+  const users = await getUsers()
+  const payload: ListRooms = {rooms, messages, users}
   const roomsMessage = buildSocketMessage(OutgoingClientMessageType.ListRooms, payload)
   socket.send(roomsMessage)
 }

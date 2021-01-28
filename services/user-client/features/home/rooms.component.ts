@@ -8,27 +8,23 @@ import {RoomsActions, RoomsSelectors} from '@store'
     <input placeholder="Partner Username" [(ngModel)]="parnterUsername" />
     <button (click)="createPrivateRoom()">Create Private Room</button>
     <div
-      *ngFor="let room of private$ | async"
+      *ngFor="let item of rooms$ | async"
       class="item"
-      [class.selected]="(activeRoomId$ | async) === room.id"
-      (click)="joinRoom(room.id)"
+      [class.selected]="(activeRoomId$ | async) === item.room.id"
+      (click)="joinRoom(item.room.id)"
     >
-      <span>{{ room.name }}</span>
-    </div>
-    <div
-      *ngFor="let room of public$ | async"
-      class="item"
-      [class.selected]="(activeRoomId$ | async) === room.id"
-      (click)="joinRoom(room.id)"
-    >
-      <span>{{ room.name }}</span>
+      <app-avatar *ngIf="item.room.isPrivate" [user]="item.partner"> </app-avatar>
+      <app-room-icon *ngIf="!item.room.isPrivate" [room]="item.room"></app-room-icon>
+      <div class="info">
+        <span class="name">{{ item.room.name }}</span>
+        <span class="message">{{ item.lastMessage?.message }}</span>
+      </div>
     </div>
   `,
   styleUrls: ['rooms.component.sass'],
 })
 export class RoomsCopmonent {
-  public$ = this.store.select(RoomsSelectors.publicRooms)
-  private$ = this.store.select(RoomsSelectors.privateRooms)
+  rooms$ = this.store.select(RoomsSelectors.roomsWithMetadata)
   activeRoomId$ = this.store.select(RoomsSelectors.activeRoomId)
   parnterUsername = ''
 

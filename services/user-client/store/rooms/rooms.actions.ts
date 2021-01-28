@@ -11,7 +11,10 @@ const sendMessage = createAction('rooms.sendMessage', props<{message: string}>()
 /**
  * Receive from server
  */
-const list = createAction('rooms.list', props<{rooms: Room[]}>())
+const list = createAction(
+  'rooms.list',
+  props<{rooms: Room[]; messages: Message[]; users: PublicUser[]}>()
+)
 const created = createAction('rooms.created', props<{room: Room}>())
 const edited = createAction('rooms.edited', props<{room: Room}>())
 const deleted = createAction('rooms.deleted', props<{id: string}>())

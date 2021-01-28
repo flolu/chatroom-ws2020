@@ -20,8 +20,8 @@ export class RoomsEffects {
       ofType(WebSocketActions.message),
       filter(({messageType}) => messageType === OutgoingClientMessageType.ListRooms),
       map(({payload}) => {
-        const {rooms} = payload as ListRooms
-        return RoomsActions.list({rooms})
+        const {rooms, messages, users} = payload as ListRooms
+        return RoomsActions.list({rooms, messages, users})
       })
     )
   )
