@@ -25,9 +25,6 @@ const offlineUsers = createSelector(UsersSelectors.entities, state, (entities, s
   return offlineIds.map(id => entities[id])
 })
 
-const publicRooms = createSelector(all, rooms => rooms.filter(r => !r.isPrivate))
-const privateRooms = createSelector(all, rooms => rooms.filter(r => r.isPrivate))
-
 const selectedMessages = createSelector(activeRoomId, allMessages, (id, all) =>
   all.filter(m => m.roomId === id)
 )
@@ -37,14 +34,13 @@ const selectedMessagesWithUser = createSelector(
   (entities, messages) => messages.map(m => ({...m, user: entities[m.fromId]}))
 )
 
-// TODO sort by last message time
 const roomsWithMetadata = createSelector(
   all,
   allMessages,
   AuthSelectors.user,
   UsersSelectors.entities,
   (rooms, messages, user, userEntities) => {
-    return rooms.map(room => {
+    const roomsWithMetadata = rooms.map(room => {
       const lastMessage = messages
         .filter(m => m.roomId === room.id)
         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
@@ -59,6 +55,13 @@ const roomsWithMetadata = createSelector(
         lastMessage,
         partner,
       }
+    })
+
+    return roomsWithMetadata.sort((a, b) => {
+      if (!b.lastMessage) return -1
+      return (
+        new Date(b.lastMessage!.timestamp).getTime() - new Date(a.lastMessage!.timestamp).getTime()
+      )
     })
   }
 )
@@ -80,8 +83,6 @@ const selectedPartner = createSelector(
 
 export const RoomsSelectors = {
   state,
-  publicRooms,
-  privateRooms,
   activeRoomId,
   activeRoom,
   onlineUsers,
