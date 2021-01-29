@@ -1,12 +1,8 @@
 import {createFeatureSelector, createSelector} from '@ngrx/store'
 
 import {RoomsSelectors} from '../rooms/rooms.selectors'
-
 import {
-  UserReducerState,
-  userRoomAdapter,
-  UserRoomReducerState,
-  usersAdapter,
+    UserReducerState, userRoomAdapter, UserRoomReducerState, usersAdapter
 } from './users.reducer'
 
 const state = createFeatureSelector<UserReducerState>('users')
@@ -21,7 +17,7 @@ const userRoomEntities = createSelector(
 
 const onlineUserIds = createSelector(state, s => s.onlineIds)
 const offlineUsers = createSelector(onlineUserIds, all, (ids, all) =>
-  all.filter(u => !ids.includes(u.id))
+  all.filter(u => !ids.includes(u.id)).sort(a => (a.isBanned ? 1 : -1))
 )
 const onlineUsers = createSelector(
   onlineUserIds,

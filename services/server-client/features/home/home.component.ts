@@ -2,9 +2,7 @@ import {Component, ElementRef, ViewChild} from '@angular/core'
 import {FormControl, FormGroup, Validators} from '@angular/forms'
 import {Actions, ofType} from '@ngrx/effects'
 import {Store} from '@ngrx/store'
-import {
-    LogsActions, LogsSelectors, RoomsActions, RoomsSelectors, UsersActions, UsersSelectors
-} from '@store'
+import {LogsActions, LogsSelectors, RoomsActions, RoomsSelectors, UsersSelectors} from '@store'
 import {debounceTime, takeWhile} from 'rxjs/operators'
 
 import {Room} from '@libs/schema'
@@ -17,10 +15,8 @@ import {Room} from '@libs/schema'
       <app-users class="users"></app-users>
     </div>
     <app-logs class="logs"></app-logs>
+
     <!-- <div class="container">
-      <div class="logs" #logs>
-        <pre>{{ logs$ | async | json }}</pre>
-      </div>
       <div class="rooms">
         <h3>Rooms</h3>
         <form [formGroup]="form" (submit)="createRoom()">
@@ -48,56 +44,6 @@ import {Room} from '@libs/schema'
         </div>
       </div>
 
-      <div class="users">
-        <h3>Users</h3>
-        <div *ngFor="let user of onlineUsers$ | async" class="user">
-          <div class="content">
-            <app-avatar [user]="user" [highlighted]="true"></app-avatar>
-            <div class="name_and_room">
-              <span>{{ user.username }}</span>
-              <span class="room" *ngIf="user.room">{{ user.room.name }}</span>
-            </div>
-            <span
-              *ngIf="warnId !== user.id"
-              class="warn material-icons"
-              (click)="startWarning(user.id)"
-              title="Warn user"
-              >warning</span
-            >
-            <span class="kick material-icons" (click)="kickUser(user.id)" title="Kick user"
-              >wifi_off</span
-            >
-            <span (click)="banUser(user.id)" class="ban material-icons" title="Ban user">
-              report
-            </span>
-          </div>
-          <div class="warn-container">
-            <input
-              *ngIf="warnId === user.id"
-              [(ngModel)]="warnMessage"
-              placeholder="Send a warning to this user"
-            />
-            <button *ngIf="warnId === user.id" (click)="warnUser(user.id)">Send warning</button>
-          </div>
-        </div>
-
-        <div *ngFor="let user of offlineUsers$ | async" class="user">
-          <div class="content">
-            <app-avatar [user]="user" [highlighted]="false"></app-avatar>
-            <div class="name_and_room">
-              <span>{{ user.username }}</span>
-            </div>
-            <span
-              *ngIf="!user.isBanned"
-              (click)="banUser(user.id)"
-              class="ban material-icons"
-              title="Ban user"
-            >
-              report
-            </span>
-          </div>
-        </div>
-      </div>
     </div> -->
   `,
   styleUrls: ['home.component.sass'],
@@ -114,8 +60,6 @@ export class HomeComponent {
   })
   editableRoomId: string
   editableRoomName: string
-  warnId: string
-  warnMessage: string
   private alive = true
 
   constructor(private store: Store, private actions$: Actions) {
@@ -149,24 +93,6 @@ export class HomeComponent {
 
   deleteRoom(id: string) {
     this.store.dispatch(RoomsActions.remove({id}))
-  }
-
-  startWarning(id: string) {
-    this.warnId = id
-    this.warnMessage = ''
-  }
-
-  warnUser(id: string) {
-    this.store.dispatch(UsersActions.warn({id, message: this.warnMessage}))
-    this.warnId = ''
-  }
-
-  kickUser(id: string) {
-    this.store.dispatch(UsersActions.kick({id}))
-  }
-
-  banUser(id: string) {
-    this.store.dispatch(UsersActions.ban({id}))
   }
 
   private scrollToBottom() {

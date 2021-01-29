@@ -1,0 +1,39 @@
+.container
+  position: absolute
+  width: 100%
+  height: 100%
+  overflow: auto
+
+.content
+  padding: .5rem
+  display: flex
+  align-items: center
+  &:hover
+    background: var(--bg-hover)
+
+  .name_and_room
+    display: flex
+    flex-direction: column
+    margin-left: 1rem
+    margin-right: auto
+    .room
+      font-size: .8rem
+      color: var(--text-light)
+
+  .ban, .warn, .kick
+    cursor: pointer
+    margin-left: .5rem
+
+.warn-container
+  display: flex
+  align-items: center
+  margin-bottom: 1rem
+  margin-left: 1rem
+  padding: 0 var(--space-small)
+  input
+    flex: 1
+  button
+    margin-left: .5rem
+
+.banned
+  background: rgba(255,0,0,0.25)
