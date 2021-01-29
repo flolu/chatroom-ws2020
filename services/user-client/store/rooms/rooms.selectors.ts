@@ -60,7 +60,8 @@ const roomsWithMetadata = createSelector(
     return roomsWithMetadata.sort((a, b) => {
       if (!b.lastMessage) return -1
       return (
-        new Date(b.lastMessage!.timestamp).getTime() - new Date(a.lastMessage!.timestamp).getTime()
+        (b.lastMessage ? new Date(b.lastMessage!.timestamp).getTime() : 0) -
+        (a.lastMessage ? new Date(a.lastMessage!.timestamp).getTime() : 0)
       )
     })
   }

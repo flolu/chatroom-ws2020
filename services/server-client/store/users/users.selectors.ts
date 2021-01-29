@@ -34,4 +34,4 @@ const onlineUsers = createSelector(
   }
 )
 
-export const UsersSelectors = {state, all, offlineUsers, onlineUsers}
+export const UsersSelectors = {state, all, offlineUsers, onlineUsers, entities}
