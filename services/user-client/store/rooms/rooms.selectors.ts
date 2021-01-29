@@ -40,6 +40,8 @@ const roomsWithMetadata = createSelector(
   AuthSelectors.user,
   UsersSelectors.entities,
   (rooms, messages, user, userEntities) => {
+    if (!user) return []
+
     const roomsWithMetadata = rooms.map(room => {
       const lastMessage = messages
         .filter(m => m.roomId === room.id)
