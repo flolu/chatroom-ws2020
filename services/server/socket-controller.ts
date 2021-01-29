@@ -72,7 +72,7 @@ export async function socketController(socket: AugmentedSocket) {
   socket.isAdmin = false
   socket.roomId = ''
 
-  await logMessage('anonymous client connected', '')
+  await logMessage({type: 'client.connected', payload: {}}, '')
 
   socket.on('message', async message => {
     const {type, payload} = JSON.parse(message.toString()) as SocketMessage<any>
@@ -106,9 +106,11 @@ export async function socketController(socket: AugmentedSocket) {
 
     await logMessage(
       {
-        message: 'client disconnected',
-        userId: socket.userId,
-        isAdmind: socket.isAdmin,
+        type: 'client.disconnected',
+        payload: {
+          userId: socket.userId,
+          isAdmind: socket.isAdmin,
+        },
       },
       socket.userId
     )
@@ -118,7 +120,7 @@ export async function socketController(socket: AugmentedSocket) {
 const logFileName = 'logs.txt'
 const logFilePath = path.join(__dirname, logFileName)
 
-async function logMessage(data: any, userId: string) {
+async function logMessage(data: {type: string; payload: any}, userId: string) {
   const payload: NetworkLog = {timestamp: new Date().toISOString(), data, userId}
   const logMessage = buildSocketMessage(OutgoingServerMessageType.Log, payload)
 
