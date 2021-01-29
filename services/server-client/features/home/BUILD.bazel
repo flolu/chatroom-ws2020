@@ -8,10 +8,30 @@ sass_binary(
     src = "home.component.sass",
 )
 
+sass_binary(
+    name = "users_styles",
+    src = "users.component.sass",
+)
+
+sass_binary(
+    name = "rooms_styles",
+    src = "rooms.component.sass",
+)
+
+sass_binary(
+    name = "logs_styles",
+    src = "logs.component.sass",
+)
+
 ng_ts_library(
     name = "home",
     srcs = glob(["*.ts"]),
-    angular_assets = ["styles"],
+    angular_assets = [
+        "styles",
+        "users_styles",
+        "rooms_styles",
+        "logs_styles",
+    ],
     tsconfig = "//services/server-client:tsconfig",
     deps = [
         "//libs/client-utils",

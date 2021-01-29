@@ -24,14 +24,6 @@ body
   font-size: 18px
   background: var(--bg)
   color: var(--text)
-  display: flex
-  flex-direction: column
-  min-width: 800px
-
-h1, h2, h3
-  font-family: 'Lora', serif
-  font-weight: normal
-  margin: 0
 
 ::-webkit-scrollbar
   width: 0.3rem
@@ -46,9 +38,26 @@ h1, h2, h3
   &:hover
     background: var(--text)
 
-::selection
-  color: white
-  background: var(--color-light)
+button
+  background: var(--color-dark)
+  color: var(--text)
+  border: none
+  border-radius: 2px
+  cursor: pointer
+  padding: .5rem 1rem
+  font-size: 1rem
+  &:hover
+    background: var(--color)
 
-.unselectable
-  user-select: none
+input
+  padding: .8rem 1rem
+  border-radius: 2px
+  outline: none
+  font-size: 1rem
+  box-sizing: border-box
+  color: var(--text)
+  border: none
+  background: var(--bg)
+  border: 1px solid var(--bg)
+  &:focus
+    border: 1px solid var(--text-dark)

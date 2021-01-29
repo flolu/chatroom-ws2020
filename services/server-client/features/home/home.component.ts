@@ -12,7 +12,12 @@ import {Room} from '@libs/schema'
 @Component({
   selector: 'app-home',
   template: `
-    <div class="container">
+    <div class="top">
+      <app-rooms class="rooms"></app-rooms>
+      <app-users class="users"></app-users>
+    </div>
+    <app-logs class="logs"></app-logs>
+    <!-- <div class="container">
       <div class="logs" #logs>
         <pre>{{ logs$ | async | json }}</pre>
       </div>
@@ -93,7 +98,7 @@ import {Room} from '@libs/schema'
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   `,
   styleUrls: ['home.component.sass'],
 })
